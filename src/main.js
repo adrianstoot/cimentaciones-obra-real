@@ -359,11 +359,14 @@ async function initialize() {
       yaw: -2.95,
       pitch: 0.07,
       distance: 5.35,
-      lookAhead: 16.5,
+      lookAhead: 4.8,
       targetHeight: 1.42,
-      focusHeight: -0.9,
+      focusHeight: 0.92,
       shoulder: -0.9,
+      minDistance: 3.35,
+      maxDistance: 8.5,
       heightSampler: (x, z) => site.getHeightAt(x, z),
+      collidersProvider: () => site.getCameraColliders(),
     });
     thirdPersonCamera.snap(player.group.position);
     weather.setMode('sunny');
@@ -526,6 +529,7 @@ window.__COR_TEST__ = {
   get site() { return site; },
   get hud() { return hud; },
   get supervisor() { return supervisorAI; },
+  get cameraController() { return thirdPersonCamera; },
   setWeather,
   setEnvironmentRotation(value) {
     const rotation = Number(value) || 0;
@@ -569,6 +573,12 @@ window.__COR_TEST__ = {
     const size = bounds.getSize(new THREE.Vector3());
     const position = player.group.position;
     const ground = site.getHeightAt(position.x, position.z);
+    const cameraAnchor = new THREE.Vector3(position.x, position.y + thirdPersonCamera.targetHeight, position.z);
+    const cameraInsideCollider = site.getCameraColliders().some((collider) => (
+      camera.position.x >= collider.min.x && camera.position.x <= collider.max.x
+      && camera.position.y >= collider.min.y && camera.position.y <= collider.max.y
+      && camera.position.z >= collider.min.z && camera.position.z <= collider.max.z
+    ));
     return {
       player: { x: position.x, y: position.y, z: position.z },
       bounds: { minY: bounds.min.y, sizeX: size.x, sizeY: size.y, sizeZ: size.z },
@@ -583,6 +593,15 @@ window.__COR_TEST__ = {
       fps: Number(document.body.dataset.fps || 0),
       render: { calls: renderer.info.render.calls, triangles: renderer.info.render.triangles },
       obstacles: site.obstacles.length,
+      cameraColliders: site.getCameraColliders().length,
+      camera: {
+        x: camera.position.x,
+        y: camera.position.y,
+        z: camera.position.z,
+        distance: camera.position.distanceTo(cameraAnchor),
+        insideCollider: cameraInsideCollider,
+        collision: thirdPersonCamera.lastCollision,
+      },
       interactions: site.interactions.length,
       rebar: site.rebar.inspection,
       spacingDefect: Boolean(site.rebar.spacingDefect?.active),

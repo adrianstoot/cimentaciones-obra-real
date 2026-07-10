@@ -6,6 +6,7 @@ import { WorkerNPC } from '../characters/WorkerNPC.js';
 import { SafetyRailSystem } from './SafetyRailSystem.js';
 import { RebarStockpile } from './RebarStockpile.js';
 import { SurfaceDetailSystem } from './SurfaceDetailSystem.js';
+import { PerimeterHoardingSystem } from './PerimeterHoardingSystem.js';
 
 const DEFAULT_LAYOUT = Object.freeze([
   { key: 'generator', asset: 'portable_generator', position: [-9.2, 0, -15.6], rotationY: 1.15 },
@@ -42,7 +43,9 @@ export class ConstructionSite {
     this.npcs = [];
     this.obstacles = [];
     this.interactions = [];
+    this.cameraColliders = [];
     this.safetyRail = null;
+    this.hoarding = null;
     this.surfaceDetails = null;
     this.stockpiles = [];
     this.terrain = new TerrainSystem({
@@ -99,6 +102,15 @@ export class ConstructionSite {
     });
     this.group.add(this.surfaceDetails.group);
 
+    this.hoarding = new PerimeterHoardingSystem({
+      width: 68,
+      depth: 56.5,
+      height: 4.65,
+      heightSampler: (x, z) => this.getHeightAt(x, z),
+    });
+    this.group.add(this.hoarding.group);
+    this.cameraColliders.push(...this.hoarding.cameraColliders);
+
     this.safetyRail = new SafetyRailSystem({
       sourceMaterial: this.rebar.material,
       heightSampler: (x, z) => this.getHeightAt(x, z),
@@ -108,6 +120,30 @@ export class ConstructionSite {
     this.safetyRail.collisionPoints.forEach((point) => {
       this.obstacles.push({ x: point.x, z: point.z, radius: 0.14, object: this.safetyRail.group });
     });
+
+    // The four soil faces are camera-only collision volumes. They let the
+    // player enter the workfront while preventing the orbit camera from
+    // travelling through the excavation wall.
+    this.cameraColliders.push(
+      { min: new THREE.Vector3(-12.2, -1.85, 6.95), max: new THREE.Vector3(12.2, 0.85, 8.35), tag: 'talud-sur' },
+      { min: new THREE.Vector3(-12.2, -1.85, -12.35), max: new THREE.Vector3(12.2, 0.85, -10.95), tag: 'talud-norte' },
+      { min: new THREE.Vector3(-12.5, -1.85, -12.35), max: new THREE.Vector3(-11.1, 0.85, 8.35), tag: 'talud-oeste' },
+      { min: new THREE.Vector3(11.1, -1.85, -12.35), max: new THREE.Vector3(12.5, 0.85, 8.35), tag: 'talud-este' },
+    );
+
+    // Individual column cages must not be represented by a single slab-wide
+    // box: doing so would place the target inside a collider permanently.
+    for (const cage of [
+      { x: -5.6, z: -5.8 },
+      { x: 5.6, z: -5.8 },
+      { x: 0, z: -2 },
+    ]) {
+      this.cameraColliders.push({
+        min: new THREE.Vector3(cage.x - 0.95, -1.7, cage.z - 0.95),
+        max: new THREE.Vector3(cage.x + 0.95, 3.4, cage.z + 0.95),
+        tag: 'jaula-armadura',
+      });
+    }
 
     const stockpile = new RebarStockpile({
       material: this.rebar.material,
@@ -265,7 +301,7 @@ export class ConstructionSite {
       npc.group.position.copy(definition.position);
       this.npcs.push(npc);
       this.interactions.push(npc.group);
-      this.registerObstacle(npc.group, 0.42);
+      this.registerObstacle(npc.group, 0.42, false);
     }
   }
 
@@ -282,17 +318,28 @@ export class ConstructionSite {
     this.interactions.push(inspection);
   }
 
-  registerObstacle(object, explicitRadius) {
+  registerObstacle(object, explicitRadius, cameraCollision = true) {
     object.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(object);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
     const radius = explicitRadius ?? Math.max(0.35, Math.min(Math.hypot(size.x, size.z) * 0.34, 5));
     this.obstacles.push({ x: center.x, z: center.z, radius, object });
+    if (cameraCollision && size.y > 0.42 && Math.max(size.x, size.z) > 0.42) {
+      this.cameraColliders.push({
+        min: box.min.clone(),
+        max: box.max.clone(),
+        tag: object.name || 'elemento-obra',
+      });
+    }
   }
 
   getHeightAt(x, z) {
     return this.terrain.getSurfaceHeightAt(x, z);
+  }
+
+  getCameraColliders() {
+    return this.cameraColliders;
   }
 
   findNearestInteraction(position, maximumDistance = 3.2) {
@@ -320,6 +367,7 @@ export class ConstructionSite {
 
   dispose() {
     this.npcs.forEach((npc) => npc.dispose());
+    this.hoarding?.dispose();
     this.safetyRail?.dispose();
     this.surfaceDetails?.dispose();
     this.stockpiles.forEach((stockpile) => stockpile.dispose());

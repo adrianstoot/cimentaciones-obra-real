@@ -267,6 +267,24 @@ async function run() {
       await page.keyboard.down('w');
       await page.waitForTimeout(950);
       const walking = await snapshot();
+      const rootMotionAudit = await page.evaluate(() => {
+        const clip = window.__COR_TEST__.player.actions.get('walk')?.getClip();
+        const tracks = clip?.tracks.filter((track) => /Hips.*(?:position|quaternion)$/i.test(track.name)) ?? [];
+        return {
+          trackNames: clip?.tracks.map((track) => track.name) ?? [],
+          roots: tracks.map((track) => {
+            const stride = /quaternion$/i.test(track.name) ? 4 : 3;
+            let maximumDelta = 0;
+            for (let offset = stride; offset < track.values.length; offset += stride) {
+              for (let component = 0; component < stride; component += 1) {
+                maximumDelta = Math.max(maximumDelta, Math.abs(track.values[offset + component] - track.values[component]));
+              }
+            }
+            return { name: track.name, maximumDelta };
+          }),
+        };
+      });
+      await capture('avatar-marcha-estable');
       await page.keyboard.down('Shift');
       await page.waitForTimeout(700);
       const running = await snapshot();
@@ -280,7 +298,12 @@ async function run() {
       record('MOVE_RUN', runDistance >= 0.65 && running.animation === 'run', 'Mayús + W activa carrera y mayor desplazamiento.', { runDistance, animation: running.animation });
       record('MOVE_IDLE', stopped.animation === 'idle', 'Al soltar controles el avatar vuelve a reposo.', { animation: stopped.animation });
       record('MOVE_GROUNDING', Math.abs(stopped.footDelta) <= 0.06, 'La locomoción mantiene los pies sobre el terreno.', { footDelta: stopped.footDelta });
-      report.runtime.locomotion = { before, walking, running, stopped, walkDistance, runDistance };
+      const rootStable = rootMotionAudit.roots.every((track) => !/position$/i.test(track.name) && track.maximumDelta < 0.00001);
+      const fullBodyRig = ['Hips', 'LeftUpLeg', 'LeftLeg', 'RightUpLeg', 'RightLeg']
+        .every((bone) => rootMotionAudit.trackNames.some((name) => name.includes(bone)));
+      record('MOVE_NO_ROOT_TWIST', rootStable, 'La marcha conserva el eje frontal sin giro ni traslacion acumulados en la cadera raiz.', rootMotionAudit);
+      record('MOVE_FULL_BODY_RIG', fullBodyRig, 'La animacion de marcha controla pelvis y ambas piernas del avatar.', rootMotionAudit.trackNames);
+      report.runtime.locomotion = { before, walking, running, stopped, walkDistance, runDistance, rootMotionAudit };
     });
 
     await step('COLLISIONS', async () => {
@@ -319,6 +342,32 @@ async function run() {
         record('COLLISION_BOUNDARY', collision.boundaryX <= 33.501, 'El jugador no abandona los límites de la obra.', collision.boundaryX);
       }
       report.runtime.collisions = collision;
+    });
+
+    await step('CAMERA_COLLISIONS', async () => {
+      await page.evaluate(() => {
+        const hook = window.__COR_TEST__;
+        hook.setPlayerPosition(9.3, 0, -Math.PI / 2);
+        hook.setCamera({ yaw: -Math.PI / 2, pitch: 0.07, distance: 5.35 });
+        hook.cameraController.update(0.1, hook.player.group.position);
+      });
+      await page.waitForTimeout(350);
+      const cameraCollision = await snapshot();
+      const playerOnScreen = await page.evaluate(() => {
+        const hook = window.__COR_TEST__;
+        const point = hook.player.group.position.clone();
+        point.y += 1;
+        point.project(hook.cameraController.camera);
+        return { x: point.x, y: point.y, visible: Math.abs(point.x) <= 0.92 && Math.abs(point.y) <= 0.92 && point.z >= -1 && point.z <= 1 };
+      });
+      record('CAMERA_COLLIDER_DENSITY', cameraCollision.cameraColliders >= 12, 'La camara reconoce cerramiento, taludes, armaduras y activos de obra.', cameraCollision.cameraColliders);
+      record('CAMERA_OBSTRUCTION_ACTIVE', Boolean(cameraCollision.camera.collision), 'El talud activa la correccion de oclusion.', cameraCollision.camera);
+      record('CAMERA_NOT_INSIDE_GEOMETRY', cameraCollision.camera.insideCollider === false, 'La camara corregida no queda dentro de un elemento.', cameraCollision.camera);
+      record('CAMERA_NO_COLLAPSE', cameraCollision.camera.distance >= 1.6, 'La camara evita colapsar sobre el avatar al encontrar un obstaculo.', cameraCollision.camera);
+      record('CAMERA_PLAYER_FRAMED', playerOnScreen.visible, 'El avatar permanece dentro del encuadre durante la correccion de camara.', playerOnScreen);
+      await capture('camara-talud-sin-clipping');
+      await page.evaluate(() => window.__COR_TEST__.setPlayerPosition(10.8, 14.4, -2.95));
+      report.runtime.cameraCollision = cameraCollision.camera;
     });
 
     await step('INTERACTION_BINDING', async () => {

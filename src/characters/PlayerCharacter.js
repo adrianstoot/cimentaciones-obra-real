@@ -16,6 +16,14 @@ function findFirstSkinnedMesh(root) {
   return result;
 }
 
+function findSkinnedMeshes(root) {
+  const meshes = [];
+  root.traverse((node) => {
+    if (node.isSkinnedMesh) meshes.push(node);
+  });
+  return meshes;
+}
+
 function normalizeNativeClip(input, name) {
   const clip = input.clone();
   clip.name = name;
@@ -29,12 +37,46 @@ function normalizeRetargetedClip(input, name) {
   const clip = input.clone();
   clip.name = name;
   clip.tracks = clip.tracks
-    .filter((track) => !/Hips\]\.position$/i.test(track.name))
+    // Locomotion may animate the hip root in both translation and rotation.
+    // Translation is always gameplay-owned. Rotation keeps only its calibrated
+    // first key so the rig retains its forward axis without corkscrewing.
+    .filter((track) => !/(?:Hips\]|Hips)\.position$/i.test(track.name))
     .map((track) => {
+      if (/(?:Hips\]|Hips)\.quaternion$/i.test(track.name) && track.values.length >= 4) {
+        const root = new THREE.Quaternion(
+          track.values[0],
+          track.values[1],
+          track.values[2],
+          track.values[3],
+        ).normalize();
+        // Freeze the calibrated first-frame axis. The worker bind pose uses the
+        // opposite forward convention from the rendered gameplay group, and
+        // this source value is the stable conversion between both rigs.
+        for (let offset = 0; offset < track.values.length; offset += 4) {
+          track.values[offset] = root.x;
+          track.values[offset + 1] = root.y;
+          track.values[offset + 2] = root.z;
+          track.values[offset + 3] = root.w;
+        }
+      }
       track.name = track.name.replace(/^\.bones\[([^\]]+)\]/, '$1');
       return track;
     });
   return clip;
+}
+
+function retargetCompositeClip(targetMeshes, sourceMesh, sourceClip, options, name) {
+  const tracks = new Map();
+  for (const targetMesh of targetMeshes) {
+    const partial = normalizeRetargetedClip(
+      retargetClip(targetMesh, sourceMesh, sourceClip, options),
+      name,
+    );
+    for (const track of partial.tracks) {
+      if (!tracks.has(track.name)) tracks.set(track.name, track);
+    }
+  }
+  return new THREE.AnimationClip(name, -1, [...tracks.values()]);
 }
 
 /** High-fidelity Mixamo-rigged worker with retargeted locomotion. */
@@ -88,9 +130,9 @@ export class PlayerCharacter {
     this.model.position.y -= initialBounds.min.y;
     this.model.updateMatrixWorld(true);
 
-    const targetMesh = findFirstSkinnedMesh(this.model);
+    const targetMeshes = findSkinnedMeshes(this.model);
     const sourceMesh = findFirstSkinnedMesh(sourceAsset.scene);
-    if (!targetMesh || !sourceMesh) throw new Error('No se encontró el rig necesario para locomoción.');
+    if (!targetMeshes.length || !sourceMesh) throw new Error('No se encontró el rig necesario para locomoción.');
 
     const sourceWalk = sourceAsset.animations.find((clip) => clip.name === 'Walk');
     const sourceRun = sourceAsset.animations.find((clip) => clip.name === 'Run');
@@ -104,11 +146,13 @@ export class PlayerCharacter {
       getBoneName: (bone) => bone.name.replace(/^mixamorig1/i, 'mixamorig'),
     };
     const walk = sourceWalk
-      ? normalizeRetargetedClip(retargetClip(targetMesh, sourceMesh, sourceWalk, retargetOptions), 'walk')
+      ? retargetCompositeClip(targetMeshes, sourceMesh, sourceWalk, retargetOptions, 'walk')
       : null;
     const run = sourceRun
-      ? normalizeRetargetedClip(retargetClip(targetMesh, sourceMesh, sourceRun, retargetOptions), 'run')
+      ? retargetCompositeClip(targetMeshes, sourceMesh, sourceRun, retargetOptions, 'run')
       : null;
+    targetMeshes.forEach((mesh) => mesh.skeleton.pose());
+    this.model.updateMatrixWorld(true);
 
     const clips = [
       normalizeNativeClip(idleAsset.animations[0], 'idle'),
@@ -204,10 +248,13 @@ export class PlayerCharacter {
     if (flatSpeed > 0.08) {
       const targetRotation = Math.atan2(this.velocity.x, this.velocity.z);
       const turnBlend = 1 - Math.exp(-this.turnSpeed * dt);
-      this.group.rotation.y = THREE.MathUtils.lerp(
-        this.group.rotation.y,
-        this.group.rotation.y + THREE.MathUtils.euclideanModulo(targetRotation - this.group.rotation.y + Math.PI, Math.PI * 2) - Math.PI,
-        turnBlend,
+      const turnDelta = THREE.MathUtils.euclideanModulo(
+        targetRotation - this.group.rotation.y + Math.PI,
+        Math.PI * 2,
+      ) - Math.PI;
+      this.group.rotation.y = Math.atan2(
+        Math.sin(this.group.rotation.y + turnDelta * turnBlend),
+        Math.cos(this.group.rotation.y + turnDelta * turnBlend),
       );
       this.play(input.run && flatSpeed > this.walkSpeed * 0.85 ? 'run' : 'walk');
       const nominal = input.run ? this.runSpeed : this.walkSpeed;
