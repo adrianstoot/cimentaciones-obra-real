@@ -35,9 +35,9 @@ export const PHASE_GUIDANCE = Object.freeze({
     idle: 'La cuadrilla está esperando una orden clara. Confirma personal, medios y alcance del trabajo.',
   }),
   inspeccion: Object.freeze({
-    speaker: 'lucia', title: 'Inspecciona antes de liberar', action: 'SCAN_FOUNDATION',
-    instruction: 'Escanea la parrilla completa y registra recubrimiento, separación, encofrado y cota con evidencia identificada.',
-    idle: 'El punto de parada sigue abierto. Acércate a Z-04 y completa la inspección con la tablet.',
+    speaker: 'lucia', title: 'Fabrica antes de montar', action: 'SCAN_FOUNDATION',
+    instruction: 'Completa la simulación de corte y doblado, valida el mandril y registra el autocontrol dimensional de la serie.',
+    idle: 'La serie no está liberada. Completa corte, mandril, doblado y autocontrol dimensional en Misiones.',
   }),
   correccion: Object.freeze({
     speaker: 'ivan', title: 'Corrige sin ocultar la incidencia', action: 'CORRECT_REBAR',

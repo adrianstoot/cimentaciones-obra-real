@@ -16,24 +16,47 @@ function findFirstSkinnedMesh(root) {
   return result;
 }
 
-function findSkinnedMeshes(root) {
-  const meshes = [];
+function createCompleteRigHelper(root) {
+  const bones = [];
   root.traverse((node) => {
-    if (node.isSkinnedMesh) meshes.push(node);
+    if (node.isBone) bones.push(node);
   });
-  return meshes;
+  const rootBone = bones.find((bone) => /Hips$/i.test(bone.name)) ?? bones[0];
+  if (!rootBone || !bones.length) return null;
+  const helper = new THREE.SkeletonHelper(rootBone);
+  helper.skeleton = new THREE.Skeleton(bones);
+  helper.name = 'worker-complete-retarget-rig';
+  return helper;
 }
 
-function normalizeNativeClip(input, name) {
+function collectRigNodeNames(root) {
+  const names = new Set();
+  root.traverse((node) => {
+    if (node.name) names.add(node.name);
+  });
+  return names;
+}
+
+function getTrackTargetName(trackName) {
+  const normalized = trackName.replace(/^\./, '');
+  const boneBinding = normalized.match(/^bones\[([^\]]+)\]/);
+  return boneBinding?.[1] ?? normalized.split('.')[0];
+}
+
+function normalizeNativeClip(input, name, rigNodeNames) {
   const clip = input.clone();
   clip.name = name;
   for (const track of clip.tracks) {
     track.name = track.name.replace(/mixamorig\d*:?(?=[A-Z])/i, 'mixamorig1');
   }
+  // Authored clips can contain optional finger bones that are absent from a
+  // particular worker export. Letting AnimationMixer bind those tracks causes
+  // warnings and, on some browsers, unstable hand/arm matrices after blending.
+  clip.tracks = clip.tracks.filter((track) => rigNodeNames.has(getTrackTargetName(track.name)));
   return clip;
 }
 
-function normalizeRetargetedClip(input, name) {
+function normalizeRetargetedClip(input, name, rigNodeNames) {
   const clip = input.clone();
   clip.name = name;
   clip.tracks = clip.tracks
@@ -49,9 +72,9 @@ function normalizeRetargetedClip(input, name) {
           track.values[2],
           track.values[3],
         ).normalize();
-        // Freeze the calibrated first-frame axis. The worker bind pose uses the
-        // opposite forward convention from the rendered gameplay group, and
-        // this source value is the stable conversion between both rigs.
+        // The source and worker use opposite forward axes. Apply that fixed
+        // conversion once, then remove all animated root yaw from locomotion.
+        root.premultiply(new THREE.Quaternion().setFromAxisAngle(WORLD_UP, Math.PI)).normalize();
         for (let offset = 0; offset < track.values.length; offset += 4) {
           track.values[offset] = root.x;
           track.values[offset + 1] = root.y;
@@ -60,23 +83,18 @@ function normalizeRetargetedClip(input, name) {
         }
       }
       track.name = track.name.replace(/^\.bones\[([^\]]+)\]/, '$1');
+      track.name = track.name.replace(/mixamorig\d*:?(?=[A-Z])/i, 'mixamorig1');
       return track;
-    });
+    })
+    .filter((track) => rigNodeNames.has(getTrackTargetName(track.name)));
   return clip;
 }
 
-function retargetCompositeClip(targetMeshes, sourceMesh, sourceClip, options, name) {
-  const tracks = new Map();
-  for (const targetMesh of targetMeshes) {
-    const partial = normalizeRetargetedClip(
-      retargetClip(targetMesh, sourceMesh, sourceClip, options),
-      name,
-    );
-    for (const track of partial.tracks) {
-      if (!tracks.has(track.name)) tracks.set(track.name, track);
-    }
-  }
-  return new THREE.AnimationClip(name, -1, [...tracks.values()]);
+function filterSourceClipToSkeleton(input, sourceMesh) {
+  const sourceBones = new Set(sourceMesh.skeleton?.bones.map((bone) => bone.name) ?? []);
+  const clip = input.clone();
+  clip.tracks = clip.tracks.filter((track) => sourceBones.has(getTrackTargetName(track.name)));
+  return clip;
 }
 
 /** High-fidelity Mixamo-rigged worker with retargeted locomotion. */
@@ -130,9 +148,9 @@ export class PlayerCharacter {
     this.model.position.y -= initialBounds.min.y;
     this.model.updateMatrixWorld(true);
 
-    const targetMeshes = findSkinnedMeshes(this.model);
+    const targetRig = createCompleteRigHelper(this.model);
     const sourceMesh = findFirstSkinnedMesh(sourceAsset.scene);
-    if (!targetMeshes.length || !sourceMesh) throw new Error('No se encontró el rig necesario para locomoción.');
+    if (!targetRig || !sourceMesh) throw new Error('No se encontró el rig necesario para locomoción.');
 
     const sourceWalk = sourceAsset.animations.find((clip) => clip.name === 'Walk');
     const sourceRun = sourceAsset.animations.find((clip) => clip.name === 'Run');
@@ -145,19 +163,29 @@ export class PlayerCharacter {
       useFirstFramePosition: true,
       getBoneName: (bone) => bone.name.replace(/^mixamorig1/i, 'mixamorig'),
     };
+    const rigNodeNames = collectRigNodeNames(this.model);
     const walk = sourceWalk
-      ? retargetCompositeClip(targetMeshes, sourceMesh, sourceWalk, retargetOptions, 'walk')
+      ? normalizeRetargetedClip(
+        retargetClip(targetRig, sourceMesh, filterSourceClipToSkeleton(sourceWalk, sourceMesh), retargetOptions),
+        'walk',
+        rigNodeNames,
+      )
       : null;
     const run = sourceRun
-      ? retargetCompositeClip(targetMeshes, sourceMesh, sourceRun, retargetOptions, 'run')
+      ? normalizeRetargetedClip(
+        retargetClip(targetRig, sourceMesh, filterSourceClipToSkeleton(sourceRun, sourceMesh), retargetOptions),
+        'run',
+        rigNodeNames,
+      )
       : null;
-    targetMeshes.forEach((mesh) => mesh.skeleton.pose());
+    targetRig.skeleton.pose();
+    targetRig.geometry?.dispose();
     this.model.updateMatrixWorld(true);
 
     const clips = [
-      normalizeNativeClip(idleAsset.animations[0], 'idle'),
-      normalizeNativeClip(tabletAsset.animations[0], 'tablet'),
-      normalizeNativeClip(putdownAsset.animations[0], 'putdown'),
+      normalizeNativeClip(idleAsset.animations[0], 'idle', rigNodeNames),
+      normalizeNativeClip(tabletAsset.animations[0], 'tablet', rigNodeNames),
+      normalizeNativeClip(putdownAsset.animations[0], 'putdown', rigNodeNames),
       walk,
       run,
     ].filter(Boolean);
@@ -222,7 +250,9 @@ export class PlayerCharacter {
 
     const blend = 1 - Math.exp(-(moving ? this.acceleration : this.deceleration) * dt);
     this.velocity.lerp(this.desired, blend);
-    if (!moving && this.velocity.lengthSq() < 0.0025) this.velocity.set(0, 0, 0);
+    // Finish the braking step decisively. A long sub-centimetre drift made the
+    // rig remain in its walk blend after the player had released the controls.
+    if (!moving && this.velocity.lengthSq() < 0.16) this.velocity.set(0, 0, 0);
 
     this._nextPosition.copy(this.group.position).addScaledVector(this.velocity, dt);
     for (const obstacle of obstacles) {

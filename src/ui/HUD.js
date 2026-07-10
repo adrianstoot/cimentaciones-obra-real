@@ -2,6 +2,7 @@ import './hud.css';
 import { assetPath } from '../assets/assetPath.js';
 
 import { ACTION_TYPES, getUIData } from '../gameState.js';
+import { renderTrainingMission, TRAINING_MISSIONS } from './TrainingMissions.js';
 
 const ICONS = Object.freeze({
   helmet: '<path d="M4 18h16"/><path d="M6 18v-3a6 6 0 0 1 12 0v3"/><path d="M9 15V8.5M15 15V8.5"/><path d="M3 18.2c2.5 1 5.5 1.5 9 1.5s6.5-.5 9-1.5"/>',
@@ -139,7 +140,7 @@ function createMarkup() {
               <li><span>Zona señalizada</span><b>${icon('check')}<em>Correcto</em></b></li>
               <li><span>Orden del tajo</span><b>${icon('check')}<em>Correcto</em></b></li>
             </ul>
-            <button class="cor-outline-button" type="button" data-hud-panel="tablet">VER CONTROL PREVIO</button>
+            <button class="cor-outline-button" type="button" data-hud-panel="mission">ABRIR MISIÓN ACTIVA</button>
           </aside>
         </div>
 
@@ -168,10 +169,10 @@ function createMarkup() {
 
         <div class="cor-hotbar cor-panel" role="toolbar" aria-label="Herramientas rápidas">
           <button type="button" data-tool="select" class="is-active"><kbd>1</kbd>${icon('cursor')}<span>Seleccionar</span></button>
-          <button type="button" data-hud-panel="tablet"><kbd>2</kbd>${icon('tablet')}<span>Tablet</span></button>
+          <button type="button" data-hud-panel="mission"><kbd>2</kbd>${icon('journal')}<span>Misiones</span></button>
           <button type="button" data-hud-panel="plans"><kbd>3</kbd>${icon('plans')}<span>Planos</span></button>
           <button type="button" data-tool="measure"><kbd>4</kbd>${icon('measure')}<span>Medir</span></button>
-          <button type="button" data-tool="inspect"><kbd>5</kbd>${icon('inspect')}<span>Verificar</span></button>
+          <button type="button" data-hud-panel="mission"><kbd>5</kbd>${icon('inspect')}<span>Simular</span></button>
           <button type="button" data-tool="camera"><kbd>6</kbd>${icon('camera')}<span>Evidencia</span></button>
           <button type="button" data-tool="radio"><kbd>7</kbd>${icon('radio')}<span>Radio</span></button>
           <button type="button" data-hud-panel="journal"><kbd>8</kbd>${icon('alert')}<span>Incidencias</span></button>
@@ -183,7 +184,7 @@ function createMarkup() {
             <div><dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Mover</dd></div>
             <div><dt><span class="cor-mouse-icon"></span></dt><dd>Rotar cámara</dd></div>
             <div><dt><kbd>F</kbd></dt><dd>Interactuar</dd></div>
-            <div><dt><kbd>R</kbd></dt><dd>Inspeccionar</dd></div>
+            <div><dt><kbd>R</kbd></dt><dd>Misión activa</dd></div>
             <div><dt><kbd>M</kbd></dt><dd>Mapa</dd></div>
             <div><dt><kbd>F10</kbd></dt><dd>Ocultar HUD</dd></div>
           </dl>
@@ -222,7 +223,7 @@ function renderChecklist(host, items = []) {
   });
 }
 
-function getModalContent(panel, ui) {
+function getModalContent(panel, ui, trainingAnswers = {}) {
   const progress = Math.round(clamp(ui?.progress));
   const checks = ui?.checklist || [];
   const verified = checks.filter((item) => item.done).length;
@@ -239,28 +240,21 @@ function getModalContent(panel, ui) {
       className: 'cor-modal--plans',
       html: `<div class="cor-blueprint">
         <div class="cor-blueprint__drawing" role="img" aria-label="Detalle técnico esquemático de la zapata Z-04">
-          <svg viewBox="0 0 760 430" fill="none"><g class="grid"><path d="M0 43h760M0 86h760M0 129h760M0 172h760M0 215h760M0 258h760M0 301h760M0 344h760M0 387h760M76 0v430M152 0v430M228 0v430M304 0v430M380 0v430M456 0v430M532 0v430M608 0v430M684 0v430"/></g><g class="line"><path d="M128 94h504v244H128zM174 132h412v168H174zM230 170h300v92H230z"/><path d="M174 216h412M380 132v168M230 170l-56-38M530 262l56 38"/><circle cx="230" cy="170" r="9"/><circle cx="530" cy="262" r="9"/></g><g class="dimension"><path d="M128 366h504M128 350v32M632 350v32M99 94v244M84 94h31M84 338h31"/><text x="355" y="391">3 200 mm</text><text x="52" y="230" transform="rotate(-90 52 230)">2 400 mm</text><text x="335" y="208">Z-04 · Ø16/200</text></g></svg>
+          <svg viewBox="0 0 760 430" fill="none"><g class="grid"><path d="M0 43h760M0 86h760M0 129h760M0 172h760M0 215h760M0 258h760M0 301h760M0 344h760M0 387h760M76 0v430M152 0v430M228 0v430M304 0v430M380 0v430M456 0v430M532 0v430M608 0v430M684 0v430"/></g><g class="line"><path d="M128 94h504v244H128zM174 132h412v168H174zM230 170h300v92H230z"/><path d="M174 216h412M380 132v168M230 170l-56-38M530 262l56 38"/><circle cx="230" cy="170" r="9"/><circle cx="530" cy="262" r="9"/></g><g class="dimension"><path d="M128 366h504M128 350v32M632 350v32M99 94v244M84 94h31M84 338h31"/><text x="355" y="391">3 800 mm</text><text x="52" y="230" transform="rotate(-90 52 230)">3 200 mm</text><text x="303" y="208">Z-04 · B500S · Ø16/200</text></g></svg>
           <span class="cor-blueprint__stamp">CONTROLADO<br><b>REV. 03</b></span>
         </div>
-        <aside class="cor-blueprint__data"><h3>DATOS DE PROYECTO</h3><dl><div><dt>Elemento</dt><dd>Zapata Z-04</dd></div><div><dt>Cota superior</dt><dd>−1,50 m</dd></div><div><dt>Recubrimiento</dt><dd>75 mm</dd></div><div><dt>Armadura inferior</dt><dd>Ø16 / 200 mm</dd></div></dl><p>${icon('info')} Valores del proyecto ficticio OR-27. No son prescripciones universales.</p></aside>
+        <aside class="cor-blueprint__data"><h3>DATOS DE PROYECTO</h3><dl><div><dt>Elemento</dt><dd>Zapata Z-04 · 3,80 × 3,20 m</dd></div><div><dt>Acero</dt><dd>B500S trazable</dd></div><div><dt>Recubrimiento</dt><dd>75 mm</dd></div><div><dt>Armadura inferior</dt><dd>Ø16 / 200 mm · X/Y</dd></div><div><dt>Solapes</dt><dd>Según detalle D-101 y cálculo</dd></div></dl><p>${icon('info')} Valores del proyecto ficticio OR-27. No son prescripciones universales.</p></aside>
       </div><div class="cor-document-list">${documents.map(([id, name, rev, status]) => `<div><span>${icon('plans')}</span><strong>${id}<small>${name}</small></strong><em>${rev}</em><b>${status}</b><button type="button" data-document="${id}" aria-label="Abrir ${name}">${icon('chevron')}</button></div>`).join('')}</div>`,
     };
   }
 
-  if (panel === 'tablet') {
-    const issue = ui?.inspection?.openIncident;
+  if (panel === 'mission' || panel === 'tablet') {
+    if (ui?.phase?.id === 'clima') return getModalContent('weather', ui, trainingAnswers);
     return {
-      eyebrow: 'TABLET RA · PUNTO DE PARADA',
-      title: 'Inspección de zapata Z-04',
-      className: 'cor-modal--tablet',
-      html: `<div class="cor-tablet-grid">
-        <div class="cor-scan-view" role="img" aria-label="Vista de escaneo de armadura">
-          <div class="cor-scan-view__mesh"></div><div class="cor-scan-view__beam"></div><span class="cor-scan-view__reticle"></span>
-          <div class="cor-scan-view__tag ${issue ? 'is-warning' : 'is-ok'}">${icon(issue ? 'alert' : 'check')}<span><small>${issue ? 'DESVIACIÓN DETECTADA' : 'CONTROL CONFORME'}</small><strong>${issue?.title || 'GEOMETRÍA REGISTRADA'}</strong></span></div>
-          <div class="cor-scan-view__reading"><small>MEDICIÓN ACTIVA</small><strong>${ui?.inspection?.observedSpacingMm || 200}<span> mm</span></strong><em>Objetivo de proyecto: 200 ± 10 mm</em></div>
-        </div>
-        <aside class="cor-inspection"><div class="cor-inspection__progress"><span>PROGRESO DE INSPECCIÓN</span><strong>${verified}/${checks.length || 6}</strong><div class="cor-progress" style="--progress:${checks.length ? verified / checks.length * 100 : 0}%"><i></i></div></div><ul>${checks.map((item) => `<li class="${item.done ? 'is-done' : item.warning ? 'is-warning' : ''}">${icon(item.done ? 'check' : item.warning ? 'alert' : 'inspect')}<span><strong>${item.label}</strong><small>${item.done ? 'VERIFICADO' : item.warning ? 'INCIDENCIA ABIERTA' : 'PENDIENTE'}</small></span></li>`).join('')}</ul><button class="cor-primary-button" type="button" data-hud-action="scan">${icon('inspect')} ESCANEAR Y REGISTRAR</button></aside>
-      </div>`,
+      eyebrow: 'SIMULADOR DE EJECUCIÓN · PROYECTO OR-27',
+      title: 'Misión formativa activa',
+      className: 'cor-modal--training',
+      html: renderTrainingMission(ui?.phase?.id, trainingAnswers, ui),
     };
   }
 
@@ -307,11 +301,16 @@ function getModalContent(panel, ui) {
   };
   const phaseArt = missionArtByPhase[ui?.phase?.id] || 'briefing';
   const missionHero = panel === 'journal' ? `<section class="cor-mission-hero"><img src="${assetPath(`assets/ui/missions/${phaseArt}.jpg`)}" alt="Escena profesional de ${ui?.phase?.label || 'la misión de cimentación'}" loading="lazy"><div><small>MISIÓN ACTIVA · OR-27 / Z-04</small><h3>${ui?.objectiveTitle || ui?.phase?.label || 'Cimentación superficial'}</h3><p>${ui?.objective || ui?.objectiveCopy || 'Completa el control con evidencia trazable y libera el punto de parada.'}</p><span>${icon('shield')} REGLAS Y DIÁLOGOS TRAZABLES</span></div></section>` : '';
+  const missionRoadmap = panel === 'journal' ? `<section class="cor-mission-roadmap"><header><span>CAMPAÑA PRÁCTICA</span><strong>De plano a cimentación</strong><small>10 misiones · ferralla, hormigón y calidad</small></header><div>${Object.entries(TRAINING_MISSIONS).map(([phaseId, mission], index) => {
+    const currentIndex = Math.max(0, (ui?.mission?.phaseNumber ?? 1) - 1);
+    const status = index < currentIndex ? 'is-complete' : index === currentIndex ? 'is-active' : 'is-locked';
+    return `<article class="${status}"><b>${mission.code}</b><span><strong>${mission.title}</strong><small>${index < currentIndex ? 'COMPLETADA' : index === currentIndex ? 'ACTIVA' : 'BLOQUEADA'}</small></span><em>+${mission.reward} XP</em></article>`;
+  }).join('')}</div></section>` : '';
   return {
     eyebrow,
     title,
     className: 'cor-modal--cards',
-    html: `${missionHero}<div class="cor-data-summary"><div><small>PAQUETE DE TRABAJO</small><strong>Z-04 · Cimentación superficial</strong><span>${ui?.phase?.label || 'Jornada en curso'}</span></div><div><small>PROGRESO</small><strong>${progress}%</strong><div class="cor-progress" style="--progress:${progress}%"><i></i></div></div></div><div class="cor-data-cards">${cards.map(([name, copy, value]) => `<article><span>${icon(panel === 'people' ? 'people' : panel === 'machinery' ? 'machinery' : panel === 'materials' ? 'materials' : 'journal')}</span><div><h3>${name}</h3><p>${copy}</p></div><strong>${value}</strong>${icon('chevron')}</article>`).join('')}</div>`,
+    html: `${missionHero}${missionRoadmap}<div class="cor-data-summary"><div><small>PAQUETE DE TRABAJO</small><strong>Z-04 · Cimentación superficial</strong><span>${ui?.phase?.label || 'Jornada en curso'}</span></div><div><small>PROGRESO</small><strong>${progress}%</strong><div class="cor-progress" style="--progress:${progress}%"><i></i></div></div></div><div class="cor-data-cards">${cards.map(([name, copy, value]) => `<article><span>${icon(panel === 'people' ? 'people' : panel === 'machinery' ? 'machinery' : panel === 'materials' ? 'materials' : 'journal')}</span><div><h3>${name}</h3><p>${copy}</p></div><strong>${value}</strong>${icon('chevron')}</article>`).join('')}</div>`,
   };
 }
 
@@ -337,6 +336,7 @@ export function createHUD(root, gameState) {
   let source = gameState;
   let currentUI = resolveUI(source) || {};
   let activePanel = null;
+  const trainingProgress = new Map();
   let lastFocus = null;
   let visible = currentUI?.ui?.hudVisible !== false;
   let unsubscribe = null;
@@ -381,7 +381,13 @@ export function createHUD(root, gameState) {
 
   function renderPanel(panelName) {
     const name = String(panelName || 'journal');
-    const content = getModalContent(name, currentUI);
+    const phase = currentUI?.phase?.id ?? 'briefing';
+    const answers = Object.fromEntries(
+      [...trainingProgress.entries()]
+        .filter(([key]) => key.startsWith(`${phase}:`))
+        .map(([key, value]) => [key.slice(phase.length + 1), value]),
+    );
+    const content = getModalContent(name, currentUI, answers);
     setText(modal, '[data-modal-eyebrow]', content.eyebrow);
     setText(modal, '[data-modal-title]', content.title);
     modalBody.innerHTML = content.html;
@@ -456,6 +462,18 @@ export function createHUD(root, gameState) {
     if (close) return closePanel();
     const reveal = event.target.closest('[data-hud-reveal]');
     if (reveal) return setVisible(true);
+    const trainingChoice = event.target.closest('[data-training-choice]');
+    if (trainingChoice) {
+      const key = `${trainingChoice.dataset.phase}:${trainingChoice.dataset.question}`;
+      const answer = {
+        choice: trainingChoice.dataset.choice,
+        correct: trainingChoice.dataset.correct === 'true',
+      };
+      trainingProgress.set(key, answer);
+      renderPanel(activePanel || 'mission');
+      announce(answer.correct ? 'Decisión correcta registrada.' : 'Decisión incorrecta. Revisa la explicación y vuelve a intentarlo.');
+      return;
+    }
     const panelButton = event.target.closest('[data-hud-panel]');
     if (panelButton) return openPanel(panelButton.dataset.hudPanel, panelButton);
     const tool = event.target.closest('[data-tool]');

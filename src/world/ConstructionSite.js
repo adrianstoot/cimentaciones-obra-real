@@ -25,6 +25,20 @@ const DEFAULT_LAYOUT = Object.freeze([
   { key: 'accessLadder', asset: 'ladder_sectioned_01', position: [-12.5, 0, 5.8], rotationY: 1.5, targetSize: 3.1, axis: 'y' },
   { key: 'fuelCan', asset: 'metal_jerrycan', position: [-10.2, 0, -15.1], rotationY: -0.25, targetSize: 0.52, axis: 'y' },
   { key: 'secondaryCrate', asset: 'wooden_crate_01', position: [-11.6, 0, -14.4], rotationY: 0.4, targetSize: 1.15 },
+  { key: 'barrelWashA', asset: 'barrel_03', position: [18.7, 0, -8.8], rotationY: -0.18, targetSize: 0.92, axis: 'y' },
+  { key: 'barrelWashB', asset: 'barrel_03', position: [19.8, 0, -8.6], rotationY: 0.31, targetSize: 0.92, axis: 'y' },
+  { key: 'generatorEast', asset: 'portable_generator', position: [20.8, 0, 7.7], rotationY: -1.25 },
+  { key: 'steelPipesEast', asset: 'modular_industrial_pipes_01', position: [20.4, 0, -7.8], rotationY: Math.PI * 0.5, targetSize: 3.1 },
+  { key: 'siteCableNorth', asset: 'modular_electric_cables', position: [-20.5, 0, 5.9], rotationY: 0.12, targetSize: 3.8 },
+  { key: 'toolChestEast', asset: 'metal_tool_chest', position: [20.2, 0, 9.1], rotationY: -1.46 },
+  { key: 'materialsShelfEast', asset: 'steel_frame_shelves_01', position: [23.2, 0, 1.2], rotationY: -Math.PI * 0.5, targetSize: 3.25, axis: 'y' },
+  { key: 'cementC', asset: 'cement_bag', position: [8.0, 0, -15.4], rotationY: 0.32 },
+  { key: 'cementD', asset: 'cement_bag', position: [8.4, 0, -15.2], rotationY: -0.22 },
+  { key: 'accessBarrierD', asset: 'concrete_road_barrier_02', position: [20.6, 0, 15.8], rotationY: Math.PI * 0.5 },
+  { key: 'accessBarrierE', asset: 'concrete_road_barrier_02', position: [20.6, 0, 19.7], rotationY: Math.PI * 0.5 },
+  { key: 'materialCrateEast', asset: 'wooden_crate_01', position: [22.1, 0, -4.8], rotationY: -0.27, targetSize: 1.2 },
+  { key: 'handTruckNorth', asset: 'hand_truck', position: [-19.5, 0, -12.8], rotationY: 0.65, targetSize: 1.6, axis: 'y' },
+  { key: 'ladderNorth', asset: 'wooden_ladder', position: [24.6, 0, -10.6], rotationY: -0.12, targetSize: 3.6, axis: 'y' },
 ]);
 
 /**
@@ -154,6 +168,25 @@ export class ConstructionSite {
     this.stockpiles.push(stockpile);
     this.group.add(stockpile.group);
     this.obstacles.push({ x: -13.2, z: -5.1, radius: 4.2, object: stockpile.group });
+
+    for (const configuration of [
+      { position: new THREE.Vector3(16.8, 0, -5.9), rotationY: -0.08 },
+      { position: new THREE.Vector3(-18.4, 0, 4.8), rotationY: Math.PI * 0.48 },
+    ]) {
+      const additionalStockpile = new RebarStockpile({
+        material: this.rebar.material,
+        ...configuration,
+        heightSampler: (x, z) => this.getHeightAt(x, z),
+      });
+      this.stockpiles.push(additionalStockpile);
+      this.group.add(additionalStockpile.group);
+      this.obstacles.push({
+        x: configuration.position.x,
+        z: configuration.position.z,
+        radius: 4.2,
+        object: additionalStockpile.group,
+      });
+    }
   }
 
   async loadLayout() {
@@ -188,6 +221,7 @@ export class ConstructionSite {
     this.group.add(crawler);
     this.props.set('crawlerCrane', crawler);
     this.registerObstacle(crawler, 4.8);
+
   }
 
   async loadPerimeterFence() {
@@ -265,31 +299,56 @@ export class ConstructionSite {
         name: 'jefa-produccion', displayName: 'Marta Gil', role: 'Jefa de producción',
         label: 'Revisar punto de parada', position: new THREE.Vector3(4.8, 0, 18.5),
         rotationY: 2.9, helmetColor: 0xf4f3e9, vestColor: 0xff7a21, scale: 1.015,
+        bubble: 'Primero entiende el encargo; después ejecuta.',
+        phaseLines: {
+          briefing: 'Confirma EPI, plano vigente y punto de parada.',
+          debrief: 'Cierra el dossier con cada decisión trazada.',
+        },
       },
       {
         name: 'tecnico-tablet', displayName: 'Diego Ramos', role: 'Técnico de calidad',
         label: 'Abrir inspección', position: new THREE.Vector3(-12.2, 0, -13.6),
         rotationY: 1.1, helmetColor: 0xf2c94c, vestColor: 0xf47b20, animation: 'tablet', scale: 0.98,
+        bubble: 'La conformidad se demuestra con datos y trazabilidad.',
+        phaseLines: {
+          planos: 'Separa siempre norma, proyecto y recomendación.',
+          reinspeccion: 'Mide recubrimiento, paso y geometría; no adivines.',
+        },
       },
       {
         name: 'ferrallista-z04', displayName: 'Sergio León', role: 'Responsable de ferralla',
         label: 'Consultar armado', position: new THREE.Vector3(-3, -1.37, -3.5),
         rotationY: -2.62, helmetColor: 0xe8b72d, vestColor: 0xe97024, scale: 1.03,
+        bubble: 'Despiece claro, corte limpio y doblado con mandril.',
+        phaseLines: {
+          inspeccion: 'Para Ø16 B500S, identifica antes qué tipo de doblado ejecutas.',
+          correccion: 'Monta separadores antes de cerrar la parrilla.',
+          reinspeccion: 'Los solapes no se resuelven con una cifra memorizada.',
+        },
       },
       {
         name: 'topografo-control', displayName: 'Óscar Martín', role: 'Topógrafo',
         label: 'Consultar replanteo', position: new THREE.Vector3(5, 0, -14),
         rotationY: 2.55, helmetColor: 0xf0ede4, vestColor: 0xe76f22, animation: 'tablet', scale: 0.96,
+        bubble: 'Ejes, cotas y referencias deben coincidir con C-101.',
+        phaseLines: { planos: 'La revisión vigente es C-101 Rev. 03.' },
       },
       {
         name: 'tecnico-prl', displayName: 'Javier Mora', role: 'Técnico de prevención',
         label: 'Revisar protecciones', position: new THREE.Vector3(-10.4, 0, 9.4),
         rotationY: 1.18, helmetColor: 0xf5f1e5, vestColor: 0xd7dc35, scale: 1.045,
+        bubble: 'Ninguna misión justifica entrar sin acceso seguro.',
+        phaseLines: { clima: 'La lluvia obliga a reevaluar, no siempre a cancelar.' },
       },
       {
         name: 'coordinador-logistica', displayName: 'Raúl Santos', role: 'Coordinador de logística',
         label: 'Comprobar suministro', position: new THREE.Vector3(10.2, 0, -13.6),
         rotationY: -2.35, helmetColor: 0xe6bd32, vestColor: 0xef7826, scale: 0.99,
+        bubble: 'Cada paquete de acero debe conservar su identificación.',
+        phaseLines: {
+          cuadrilla: 'Comprueba etiqueta, colada, diámetro y destino Z-04.',
+          vertido: 'Albarán, lote, hora y volumen antes de descargar.',
+        },
       },
     ];
 
@@ -310,9 +369,9 @@ export class ConstructionSite {
     inspection.name = 'inspection-point-z04';
     inspection.position.set(0, -0.7, 6.2);
     inspection.userData.interaction = {
-      type: 'inspection',
-      label: 'Escanear armadura Z-04',
-      panel: 'tablet',
+      type: 'mission',
+      label: 'Abrir simulación de ferralla Z-04',
+      panel: 'mission',
     };
     this.group.add(inspection);
     this.interactions.push(inspection);

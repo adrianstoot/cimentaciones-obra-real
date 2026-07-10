@@ -213,10 +213,32 @@ async function run() {
       return sample;
     };
 
+    const completeMissionThroughUI = async (phase) => {
+      if (phase === 'clima') {
+        await page.locator('[data-hud-panel="weather"]').first().click();
+        await page.locator('[data-hud-action="safe-weather"]').click();
+        await page.waitForTimeout(220);
+        return;
+      }
+      await page.locator('[data-hud-panel="mission"]').first().click();
+      await page.locator('.cor-training').waitFor({ state: 'visible' });
+      let guard = 0;
+      while (await page.locator('[data-training-choice][data-correct="true"]:not([disabled])').count()) {
+        await page.locator('[data-training-choice][data-correct="true"]:not([disabled])').first().click();
+        await page.waitForTimeout(35);
+        guard += 1;
+        if (guard > 8) throw new Error(`La misión ${phase} no converge al resolver sus decisiones.`);
+      }
+      await page.locator('[data-hud-action="complete-training"]:not([disabled])').click();
+      await page.waitForTimeout(230);
+    };
+
     const initial = await snapshot();
     report.runtime.initial = initial;
     record('INITIAL_PHASE', initial?.phase === 'briefing', 'La sesión empieza en briefing.', initial);
-    record('SCENE_DENSITY', initial?.obstacles >= 8 && initial?.interactions >= 3, 'La escena contiene colisiones e interacciones suficientes.', initial);
+    record('SCENE_DENSITY', initial?.obstacles >= 80 && initial?.props >= 25 && initial?.stockpiles >= 3, 'La obra contiene acopios, maquinaria y utilería de producción suficientes.', initial);
+    const visibleSpeech = await page.locator('.cor-npc-speech:not([hidden])').count();
+    record('NPC_SPEECH_BUBBLES', visibleSpeech >= 1, 'Los NPC cercanos muestran bocadillos técnicos anclados a su avatar.', visibleSpeech);
     record('REBAR_READY', initial?.rebar?.lowerBarCount >= 100, 'La armadura técnica está inicializada.', initial?.rebar);
     record('AVATAR_HEIGHT', initial?.bounds?.sizeY >= 1.55 && initial?.bounds?.sizeY <= 2.15, 'El avatar conserva una escala humana plausible.', initial?.bounds);
     record('AVATAR_GROUNDED', Math.abs(initial?.footDelta ?? 99) <= 0.06, 'Los pies del avatar coinciden con la rasante.', { footDelta: initial?.footDelta });
@@ -288,6 +310,7 @@ async function run() {
       await page.keyboard.down('Shift');
       await page.waitForTimeout(700);
       const running = await snapshot();
+      await capture('avatar-carrera-estable');
       await page.keyboard.up('Shift');
       await page.keyboard.up('w');
       await page.waitForTimeout(500);
@@ -373,7 +396,7 @@ async function run() {
     await step('INTERACTION_BINDING', async () => {
       const placement = await page.evaluate(() => {
         const hook = window.__COR_TEST__;
-        const target = hook.site.interactions.find((item) => item.userData?.interaction?.panel === 'tablet')
+        const target = hook.site.interactions.find((item) => item.userData?.interaction?.panel === 'mission')
           ?? hook.site.interactions.find((item) => item.userData?.interaction);
         if (!target) return { found: false };
         const world = target.getWorldPosition(target.position.clone());
@@ -426,9 +449,18 @@ async function run() {
           focusInside: Boolean(dialog?.contains(document.activeElement)),
         };
       });
-      record('TABLET_KEY', modal.panel === 'tablet', 'T abre la tablet.', modal);
-      record('MODAL_SEMANTICS', modal.ariaModal === 'true' && Boolean(modal.labelledBy), 'La tablet usa semántica de diálogo modal.', modal);
+      record('MISSION_KEY', modal.panel === 'mission', 'T abre la misión formativa activa.', modal);
+      record('MODAL_SEMANTICS', modal.ariaModal === 'true' && Boolean(modal.labelledBy), 'La misión usa semántica de diálogo modal.', modal);
       record('MODAL_FOCUS_ENTRY', modal.focusInside, 'Al abrir un panel el foco entra en el diálogo.', modal);
+      await page.locator('[data-training-choice][data-correct="false"]').first().click();
+      const wrongDecision = {
+        feedback: await page.locator('.cor-training-questions article.is-wrong').count(),
+        completionDisabled: await page.locator('[data-hud-action="complete-training"]').isDisabled(),
+      };
+      record('TRAINING_REJECTS_ERROR', wrongDecision.feedback === 1 && wrongDecision.completionDisabled, 'Una decisión técnica incorrecta explica el fallo y bloquea el avance.', wrongDecision);
+      await page.locator('[data-training-choice][data-correct="true"]:not([disabled])').first().click();
+      record('TRAINING_ACCEPTS_CORRECTION', await page.locator('.cor-training-questions article.is-correct').count() === 1, 'La corrección del alumno queda registrada en la misión.');
+      await capture('mision-m01-decision-corregida');
       for (let index = 0; index < 5; index += 1) await page.keyboard.press('Tab');
       const trapped = await page.evaluate(() => document.querySelector('[role="dialog"]')?.contains(document.activeElement));
       record('MODAL_FOCUS_TRAP', trapped, 'El tabulador no escapa del panel modal.');
@@ -521,22 +553,14 @@ async function run() {
           record('BROWSER_SAVE_LOAD', persisted.ok && persisted.phase === 'correccion' && persisted.incident === 'open', 'El guardado real del navegador conserva fase, incidencia y evidencia.', persisted);
         }
 
+        await completeMissionThroughUI(expected);
         if (expected === 'inspeccion') {
-          await page.keyboard.press('t');
-          await page.locator('[data-hud-action="scan"]').click();
-          await page.waitForTimeout(260);
-          const scanned = await snapshot();
-          record('INCIDENT_DETECTED', scanned.phase === 'correccion' && scanned.spacingDefect, 'El escaneo detecta y representa la separación incorrecta.', scanned);
-          record('INSPECTION_AR_OVERLAY', scanned.inspectionOverlay, 'La tablet resalta visualmente la barra no conforme.', scanned);
-          await capture('tablet-incidencia-ra');
-          await page.keyboard.press('Escape');
-        } else if (expected !== 'debrief') {
-          await page.evaluate(() => window.__COR_TEST__.completeRecommendedAction());
-          await page.waitForTimeout(170);
+          const fabricated = await snapshot();
+          record('FABRICATION_MISSION', fabricated.phase === 'correccion' && fabricated.spacingDefect, 'Corte y doblado avanzan al montaje y materializan la desviación de paso.', fabricated);
+          record('SCANNER_REMOVED', await page.locator('.cor-scan-view, [data-hud-action="scan"]').count() === 0, 'La experiencia ya no contiene el escáner ficticio.');
+          await capture('mision-ferralla-incidencia');
         }
       }
-      await page.evaluate(() => window.__COR_TEST__.completeRecommendedAction());
-      await page.waitForTimeout(180);
       const completed = await snapshot();
       record('MISSION_COMPLETED', completed.phase === 'debrief' && completed.missionStatus === 'completed', 'El dossier final cierra la misión.', completed);
       report.runtime.completed = completed;
