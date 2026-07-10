@@ -13,11 +13,13 @@ import { WeatherSystem } from './world/WeatherSystem.js';
 import { PlayerCharacter } from './characters/PlayerCharacter.js';
 import { ThirdPersonCamera } from './camera/ThirdPersonCamera.js';
 import { createHUD } from './ui/HUD.js';
+import { NPCSpeechBubbles } from './ui/NPCSpeechBubbles.js';
 import { SiteSupervisorAI } from './ai/index.js';
 import {
   ACTION_TYPES,
   createGameStore,
   getAvailableActions,
+  getUIData,
 } from './gameState.js';
 
 const app = document.querySelector('#app');
@@ -36,7 +38,7 @@ app.innerHTML = `
         <h1>Cimentaciones<br><strong>Obra Real</strong></h1>
         <p class="cor-start__lead">Inspecciona una losa de cimentación a escala real, coordina el punto de parada y documenta cada decisión.</p>
         <ul class="cor-start__features" aria-label="Características">
-          <li>PERSONAJE 3D RIGGEADO</li><li>MATERIALES PBR 4K</li><li>INSPECCIÓN RA</li><li>CLIMA DINÁMICO</li>
+          <li>PERSONAJE 3D RIGGEADO</li><li>MATERIALES PBR 4K</li><li>SIMULACIÓN DE FERRALLA</li><li>CLIMA DINÁMICO</li>
         </ul>
         <button class="cor-start__button" type="button" data-start-button disabled>
           <span data-start-label>PREPARANDO OBRA</span><small data-start-detail>Geometría técnica y activos de producción</small>
@@ -165,6 +167,7 @@ let spacingDefectActive = false;
 let supervisorAI;
 let supervisorTimer = 0;
 let activeSupervisorEvent = null;
+let speechBubbles;
 
 function syncConstructionPhase(state) {
   if (!site?.terrain || !site?.rebar) return;
@@ -172,7 +175,7 @@ function syncConstructionPhase(state) {
   site.terrain.setConcretePhase(poured ? 'foundation' : 'blinding');
   site.rebar.setConstructionStage(poured
     ? 'hidden'
-    : ['inspeccion', 'correccion', 'reinspeccion', 'clima', 'vertido'].includes(state.phase)
+    : ['correccion', 'reinspeccion', 'clima', 'vertido'].includes(state.phase)
       ? 'complete'
       : 'lower');
 
@@ -262,24 +265,22 @@ function completeRecommendedAction() {
   const action = available.find((item) => item.recommended) ?? available[0];
   if (!action) {
     showNotice('El paquete actual ya no tiene acciones pendientes', 'info');
-    return;
+    return null;
   }
   const result = store.dispatch({ type: action.type });
   supervisorAI?.reportAction(action.type, result, { state: result.state ?? store.getState() });
   if (result.ok) showNotice(action.successTitle ?? action.label ?? 'Acción registrada');
   else showNotice(result.error ?? 'Acción no disponible', 'warning');
+  return result;
 }
 
 function interact() {
   if (!nearestInteraction) return;
   const { data } = nearestInteraction;
-  if (data?.panel === 'tablet' || data?.type === 'inspection') {
-    hud.openPanel('tablet');
-    player.setInteractionPose(true);
-    return;
-  }
-  hud.openPanel('journal');
-  completeRecommendedAction();
+  const state = store.getState();
+  const dialogue = state.phase ? getUIData(state).dialogue : null;
+  if (data?.type === 'npc') speechBubbles?.speak(nearestInteraction.object, dialogue?.text ?? `Soy ${data.name}. Revisa la misión activa antes de ejecutar.`);
+  hud.openPanel(state.phase === 'clima' ? 'weather' : 'mission');
 }
 
 function setWeather(mode) {
@@ -339,6 +340,10 @@ async function initialize() {
 
     setLoading(78, 'Distribuyendo maquinaria, vallado y acopios GLB…');
     await site.ready;
+    speechBubbles = new NPCSpeechBubbles(app, camera, site.npcs, {
+      getPlayerPosition: () => player?.group?.position ?? null,
+      getPhase: () => store.getState().phase,
+    });
     spacingDefectActive = Boolean(store.getState().flags?.defectDetected && !store.getState().flags?.correctionApplied);
     site.rebar.setSpacingDefect(spacingDefectActive);
     syncConstructionPhase(store.getState());
@@ -396,14 +401,14 @@ function startGame() {
   startScreen.classList.add('is-hidden');
   hud.setVisible(true);
   canvas.focus({ preventScroll: true });
-  showNotice('Punto de parada Z-04 listo para inspección', 'info');
+  showNotice('Misión M01 activa · recibe el tajo y prepara la ferralla', 'info');
 }
 
 startButton.addEventListener('click', startGame);
 hudRoot.addEventListener('cor:hud-action', (event) => {
-  if (event.detail.action === 'scan') {
-    completeRecommendedAction();
-    site.rebar.setConstructionStage('complete');
+  if (event.detail.action === 'complete-training') {
+    const result = completeRecommendedAction();
+    if (result?.ok) hud.closePanel();
   }
   if (event.detail.action === 'unsafe-weather') {
     setWeather('rain');
@@ -419,7 +424,7 @@ hudRoot.addEventListener('cor:hud-action', (event) => {
   }
 });
 hudRoot.addEventListener('cor:hud-tool', (event) => {
-  if (event.detail.tool === 'inspect') hud.openPanel('tablet');
+  if (event.detail.tool === 'inspect') hud.openPanel('mission');
   if (event.detail.tool === 'camera') showNotice('Evidencia fotográfica vinculada al registro Z-04');
 });
 
@@ -430,12 +435,12 @@ window.addEventListener('keydown', (event) => {
   }
   if (event.repeat) return;
   if ((event.code === 'KeyE' || event.code === 'KeyF') && !hud.activePanel) interact();
-  if (event.code === 'KeyT') hud.activePanel === 'tablet' ? hud.closePanel() : hud.openPanel('tablet');
+  if (event.code === 'KeyT') hud.activePanel === 'mission' ? hud.closePanel() : hud.openPanel('mission');
   if (event.code === 'KeyM') hud.activePanel ? hud.closePanel() : hud.openPanel('journal');
   if (event.code === 'KeyG') cycleWeather();
-  if (event.code === 'Digit2') hud.openPanel('tablet');
+  if (event.code === 'Digit2') hud.openPanel('mission');
   if (event.code === 'Digit3') hud.openPanel('plans');
-  if (event.code === 'KeyR' && !hud.activePanel) hud.openPanel('tablet');
+  if (event.code === 'KeyR' && !hud.activePanel) hud.openPanel('mission');
 });
 window.addEventListener('keyup', (event) => keys.delete(event.code));
 window.addEventListener('blur', () => keys.clear());
@@ -459,7 +464,8 @@ function animate() {
     player.update(delta, currentInput(), thirdPersonCamera.yaw, site.obstacles);
     thirdPersonCamera.update(delta, player.group.position);
     site.update(delta);
-    site.rebar.setInspectionOverlay(hud.activePanel === 'tablet' && spacingDefectActive);
+    speechBubbles?.update(delta);
+    site.rebar.setInspectionOverlay(false);
     weather.update(delta, player.group.position);
     if (gameStarted) {
       supervisorAI?.update(delta, {
@@ -472,7 +478,7 @@ function animate() {
         },
         ui: {
           modalOpen: Boolean(hud.activePanel),
-          tabletOpen: hud.activePanel === 'tablet',
+          tabletOpen: false,
         },
       });
     }
@@ -518,6 +524,7 @@ window.addEventListener('beforeunload', () => {
   site?.dispose();
   weather?.dispose();
   supervisorAI?.dispose();
+  speechBubbles?.dispose();
   composer.dispose();
   hud.destroy();
 });
@@ -593,6 +600,8 @@ window.__COR_TEST__ = {
       fps: Number(document.body.dataset.fps || 0),
       render: { calls: renderer.info.render.calls, triangles: renderer.info.render.triangles },
       obstacles: site.obstacles.length,
+      props: site.props.size,
+      stockpiles: site.stockpiles.length,
       cameraColliders: site.getCameraColliders().length,
       camera: {
         x: camera.position.x,

@@ -1,12 +1,27 @@
 import * as THREE from 'three';
 import { ANIMATIONS, CHARACTERS } from '../assets/assetManifest.js';
 
-function normalizeClip(input, name) {
+function collectRigNodeNames(root) {
+  const names = new Set();
+  root.traverse((node) => {
+    if (node.name) names.add(node.name);
+  });
+  return names;
+}
+
+function getTrackTargetName(trackName) {
+  const normalized = trackName.replace(/^\./, '');
+  const boneBinding = normalized.match(/^bones\[([^\]]+)\]/);
+  return boneBinding?.[1] ?? normalized.split('.')[0];
+}
+
+function normalizeClip(input, name, rigNodeNames) {
   const clip = input.clone();
   clip.name = name;
   for (const track of clip.tracks) {
     track.name = track.name.replace(/mixamorig\d*:?(?=[A-Z])/i, 'mixamorig1');
   }
+  clip.tracks = clip.tracks.filter((track) => rigNodeNames.has(getTrackTargetName(track.name)));
   return clip;
 }
 
@@ -50,7 +65,11 @@ export class WorkerNPC {
     this.group.position.copy(this.options.position ?? new THREE.Vector3());
     this.group.rotation.y = this.options.rotationY ?? 0;
 
-    const clip = normalizeClip(animation.animations[0], this.options.animation ?? 'idle');
+    const clip = normalizeClip(
+      animation.animations[0],
+      this.options.animation ?? 'idle',
+      collectRigNodeNames(this.model),
+    );
     this.mixer = new THREE.AnimationMixer(this.model);
     this.action = this.mixer.clipAction(clip);
     this.action.play();
@@ -60,6 +79,8 @@ export class WorkerNPC {
       label: this.options.label ?? 'Hablar',
       role: this.options.role ?? 'Trabajador de obra',
       name: this.options.displayName ?? 'Profesional de obra',
+      bubble: this.options.bubble ?? 'Listo para coordinar el tajo.',
+      phaseLines: this.options.phaseLines ?? {},
     };
     this.group.visible = true;
     return this;

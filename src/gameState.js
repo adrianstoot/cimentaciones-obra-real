@@ -7,8 +7,8 @@
  * dispatch the actions exposed by `getAvailableActions(state)`.
  */
 
-export const SAVE_VERSION = 1;
-export const STORAGE_KEY = "cimentaciones-obra-real:web:v1";
+export const SAVE_VERSION = 2;
+export const STORAGE_KEY = "cimentaciones-obra-real:web:v2";
 
 export const PHASES = Object.freeze([
   "briefing",
@@ -36,50 +36,50 @@ export const PHASE_DEFINITIONS = Object.freeze({
   },
   planos: {
     index: 1,
-    label: "Planos y prescripciones",
-    kicker: "DOCUMENTACIÓN",
-    objective: "Contrasta el plano C-101, el geotécnico y el plan de control.",
-    instruction: "Abre la tablet y valida los datos específicos de la zapata Z-04.",
-    location: "Mesa de planos",
+    label: "Detalle técnico y despiece",
+    kicker: "MISIÓN M02 · FERRALLA",
+    objective: "Transforma C-101 Rev. 03 en un esquema de armado y una planilla de despiece trazable.",
+    instruction: "Abre Misiones y resuelve acero, marcas, cantidades y fuente de cada prescripción.",
+    location: "Mesa técnica de ferralla",
     icon: "blueprint",
     tone: "blue",
   },
   cuadrilla: {
     index: 2,
-    label: "Asignación de cuadrilla",
-    kicker: "PLANIFICACIÓN",
-    objective: "Asigna una cuadrilla competente y reserva los medios necesarios.",
-    instruction: "Selecciona Ferralla Norte y confirma su charla de tarea.",
-    location: "Zona de coordinación",
+    label: "Recepción de acero y taller",
+    kicker: "MISIÓN M03 · TRAZABILIDAD",
+    objective: "Recepciona B500S Ø16, conserva las etiquetas y prepara corte y doblado.",
+    instruction: "Comprueba lote, destino Z-04, equipos y competencia de Ferralla Norte.",
+    location: "Acopio y taller de ferralla",
     icon: "crew",
     tone: "orange",
   },
   inspeccion: {
     index: 3,
-    label: "Inspección previa",
-    kicker: "PUNTO DE PARADA",
-    objective: "Escanea la armadura, mide recubrimiento, separación y cota.",
-    instruction: "Usa la tablet sobre la zapata Z-04 y registra evidencia.",
-    location: "Campo de cimentaciones",
-    icon: "scan",
+    label: "Corte y doblado de barras",
+    kicker: "MISIÓN M04 · FABRICACIÓN",
+    objective: "Simula la fabricación: corte, mandril, doblado y autocontrol dimensional.",
+    instruction: "Resuelve el taller de ferralla y libera la primera serie para montaje.",
+    location: "Taller de ferralla",
+    icon: "tools",
     tone: "cyan",
   },
   correccion: {
     index: 4,
-    label: "Corrección de armadura",
-    kicker: "INCIDENCIA ABIERTA",
-    objective: "Corrige la separación fuera de proyecto sin ocultar la no conformidad.",
-    instruction: "Ordena el reajuste de barras y documenta la corrección.",
+    label: "Montaje de parrilla y esperas",
+    kicker: "MISIÓN M05 · ARMADO",
+    objective: "Monta separadores, parrilla inferior y esperas; corrige un paño fuera de paso.",
+    instruction: "Ordena la secuencia, bloquea la desviación de 270 mm y reajusta antes de continuar.",
     location: "Zapata Z-04",
     icon: "tools",
     tone: "red",
   },
   reinspeccion: {
     index: 5,
-    label: "Reinspección",
-    kicker: "VERIFICACIÓN",
-    objective: "Comprueba de nuevo la geometría y cierra la incidencia con evidencia.",
-    instruction: "Repite la medición antes de liberar el punto de parada.",
+    label: "Solapes, anclajes y control final",
+    kicker: "MISIÓN M06 · VERIFICACIÓN",
+    objective: "Resuelve el solape conforme al detalle calculado y verifica recubrimiento y estabilidad.",
+    instruction: "Demuestra longitud, separación, armadura transversal y cierre de la incidencia.",
     location: "Zapata Z-04",
     icon: "check",
     tone: "green",
@@ -168,36 +168,36 @@ export const ACTION_CATALOG = Object.freeze({
   },
   [ACTION_TYPES.REVIEW_PLANS]: {
     phase: "planos",
-    label: "Revisar documentación",
-    description: "Lee los tres documentos y fija los datos de proyecto.",
+    label: "Aprobar detalle y despiece",
+    description: "Completa la misión técnica C-101 y genera la planilla Z-04.",
     icon: "blueprint",
     tone: "primary",
   },
   [ACTION_TYPES.ASSIGN_CREW]: {
     phase: "cuadrilla",
-    label: "Asignar Ferralla Norte",
-    description: "Reserva 3 oficiales y confirma medios y charla de tarea.",
+    label: "Recepcionar acero y movilizar",
+    description: "Valida B500S Ø16, etiquetas, equipos y Ferralla Norte.",
     icon: "crew",
     tone: "primary",
   },
   [ACTION_TYPES.SCAN_FOUNDATION]: {
     phase: "inspeccion",
-    label: "Escanear zapata",
-    description: "Ejecuta la inspección RA y registra las mediciones.",
-    icon: "scan",
+    label: "Completar corte y doblado",
+    description: "Fabrica las marcas del despiece y valida mandril y dimensiones.",
+    icon: "tools",
     tone: "primary",
   },
   [ACTION_TYPES.CORRECT_REBAR]: {
     phase: "correccion",
-    label: "Corregir armadura",
-    description: "Reajusta la parrilla a la separación del proyecto.",
+    label: "Montar y corregir parrilla",
+    description: "Coloca separadores, arma la parrilla y reajusta el paño no conforme.",
     icon: "tools",
     tone: "primary",
   },
   [ACTION_TYPES.REINSPECT]: {
     phase: "reinspeccion",
-    label: "Reinspeccionar",
-    description: "Repite las mediciones y cierra la incidencia.",
+    label: "Validar solapes y armado",
+    description: "Comprueba anclajes, solapes, paso y recubrimiento antes de liberar.",
     icon: "check",
     tone: "primary",
   },
@@ -305,6 +305,42 @@ export const TECHNICAL_RULES = Object.freeze([
     educational: true,
   },
   {
+    id: "CE-49-3-1-DESPIECE",
+    version: "RD470/2021",
+    category: "normativa",
+    title: "Planilla de despiece de armaduras",
+    requirement: "La planilla debe derivar de los planos, identificar geometría y características, cantidad de armaduras iguales y elemento de destino, y estar firmada por su responsable.",
+    source: "Código Estructural · artículo 49.3.1",
+    effectiveOn: "2021-11-10",
+    reviewedOn: "2026-07-10",
+    appliesTo: ["ferralla", "Z-04"],
+    educational: true,
+  },
+  {
+    id: "CE-49-3-4-DOBLADO",
+    version: "RD470/2021",
+    category: "normativa",
+    title: "Doblado de armaduras pasivas",
+    requirement: "Doblado previo a la colocación, a temperatura ambiente, con dobladora, velocidad constante, mandril adecuado y curvatura uniforme. Para el ejercicio de gancho Ø16 B500S: diámetro mínimo de mandril 4φ.",
+    source: "Código Estructural · artículo 49.3.4",
+    effectiveOn: "2021-11-10",
+    reviewedOn: "2026-07-10",
+    appliesTo: ["B500S", "doblado"],
+    educational: true,
+  },
+  {
+    id: "CE-49-5-2-SOLAPES",
+    version: "RD470/2021",
+    category: "normativa",
+    title: "Empalmes por solapo",
+    requirement: "La longitud depende de α y de la longitud neta de anclaje; no es un múltiplo universal. Las barras se disponen una junto a otra, con separación limitada, y se comprueba armadura transversal.",
+    source: "Código Estructural · artículos 49.5.2.1 y 49.5.2.2",
+    effectiveOn: "2021-11-10",
+    reviewedOn: "2026-07-10",
+    appliesTo: ["solapes", "Z-04"],
+    educational: true,
+  },
+  {
     id: "OR27-PC-HM-07",
     version: "2.0",
     category: "proyecto",
@@ -369,27 +405,27 @@ export const DIALOGUES = Object.freeze({
   planos: {
     speaker: "Diego Martín",
     role: "Ingeniero de estructuras",
-    text: "No memorices un valor aislado: comprueba qué exige este proyecto, con qué revisión y para qué elemento.",
+    text: "Convierte C-101 Rev. 03 en marcas inequívocas: forma, diámetro, cantidad, acero y destino. La norma no sustituye al despiece del proyecto.",
   },
   cuadrilla: {
     speaker: "Iván Ruiz",
     role: "Capataz",
-    text: "Ferralla Norte conoce el tajo. Confirma medios, charla previa y que nadie trabaje sobre una orden ambigua.",
+    text: "Antes de cortar, conserva etiqueta y colada. Una barra sin identidad no entra en la serie Z04-LI.",
   },
   inspeccion: {
     speaker: "Lucía Torres",
     role: "Técnica de calidad",
-    text: "Escanea toda la parrilla. Una foto ayuda, pero la aceptación necesita mediciones identificadas.",
+    text: "Configura la cizalla y el mandril desde la planilla. Para este gancho Ø16 B500S el ejercicio exige 4φ: 64 milímetros.",
   },
   correccion: {
     speaker: "Iván Ruiz",
     role: "Capataz",
-    text: "Tenemos 270 milímetros donde el plano marca 200. Paro el frente y reajustamos antes de seguir.",
+    text: "Primero separadores, luego parrilla y esperas. Tenemos 270 milímetros donde C-101 marca 200 ±10: paro, reajusto y vuelvo a medir.",
   },
   reinspeccion: {
     speaker: "Lucía Torres",
     role: "Técnica de calidad",
-    text: "La reparación no cierra sola la incidencia. Repite el control y adjunta la evidencia final.",
+    text: "No acepto 'siempre 50φ'. El solape debe coincidir con α·lb,neta, su posición, separación y armadura transversal de proyecto.",
   },
   clima: {
     speaker: "Nuria Vega",
@@ -502,8 +538,8 @@ export function createInitialState(options = {}) {
     phaseIndex: 0,
     mission: {
       id: "VS-Z04-01",
-      title: "Punto de parada: zapata Z-04",
-      subtitle: "Vertical slice · Jornada 07",
+      title: "De plano a cimentación: zapata Z-04",
+      subtitle: "Campaña práctica de ferralla · Jornada 07",
       status: "active",
       startedAt: createdAt,
       completedAt: null,
@@ -557,6 +593,7 @@ export function createInitialState(options = {}) {
       type: "zapata_aislada",
       dimensionsM: { length: 3.8, width: 3.2, depth: 0.85 },
       design: {
+        steelGrade: "B500S",
         rebar: "Ø16 / 200 mm",
         spacingMm: 200,
         spacingToleranceMm: 10,
@@ -566,6 +603,12 @@ export function createInitialState(options = {}) {
         elevationToleranceM: 0.02,
         concrete: "HA-30/F/20/XC2",
         volumeM3: 10.34,
+        bendingSchedule: [
+          { mark: "Z04-LI-X", steel: "B500S", diameterMm: 16, spacingMm: 200, shape: "recta", destination: "parrilla inferior X" },
+          { mark: "Z04-LI-Y", steel: "B500S", diameterMm: 16, spacingMm: 200, shape: "recta", destination: "parrilla inferior Y" },
+          { mark: "Z04-PE-16", steel: "B500S", diameterMm: 16, shape: "espera con patilla", mandrelMm: 64, destination: "arranque de pilar" },
+        ],
+        lapRule: "α · lb,neta según detalle D-101; sin valor universal",
       },
       asBuilt: {
         spacingMm: 270,
@@ -591,13 +634,14 @@ export function createInitialState(options = {}) {
       findings: [],
       evidence: [],
       scanCompletedAt: null,
+      fabricationCompletedAt: null,
       reinspectionCompletedAt: null,
     },
     incidents: [
       {
         id: "INC-Z04-001",
         title: "Separación irregular de armadura",
-        description: "Lectura latente de 270 mm en el paño noreste frente a 200 ±10 mm del proyecto.",
+        description: "Desviación de montaje de 270 mm en el paño noreste frente a 200 ±10 mm del proyecto.",
         status: "latent",
         severity: "high",
         ruleId: "OR27-C101-SEP-Z04",
@@ -671,6 +715,9 @@ export function createInitialState(options = {}) {
       briefingAccepted: false,
       plansReviewed: false,
       crewAssigned: false,
+      detailCompleted: false,
+      fabricationCompleted: false,
+      assemblyCompleted: false,
       defectDetected: false,
       correctionApplied: false,
       reinspectionPassed: false,
@@ -896,23 +943,24 @@ function handleGameplayAction(state, action) {
     case ACTION_TYPES.REVIEW_PLANS: {
       state.project.documents.forEach((document) => { document.reviewed = true; });
       state.flags.plansReviewed = true;
+      state.flags.detailCompleted = true;
       state.workPackage.status = "resource_planning";
       state.workPackage.percent = 16;
       state.report.sections.documentation = true;
       state.inspection.evidence.push(
-        makeEvidence("document", "Plano C-101 Rev. 3 revisado", "Z-04 · Ø16/200 · cota −1,50 m", "OR27-C101-SEP-Z04"),
+        makeEvidence("document", "Detalle y planilla Z-04 aprobados", "B500S · Ø16/200 · marcas Z04-LI-X/Y y Z04-PE-16", "CE-49-3-1-DESPIECE"),
       );
       setClock(state, 8 * 60 + 42);
       completeStandardAction(state, action.type, {
-        title: "Fuente de verdad fijada",
-        text: "Las prescripciones del proyecto ficticio quedan vinculadas a la inspección.",
+        title: "Despiece técnico aprobado",
+        text: "La planilla identifica forma, acero, diámetro, cantidad, revisión y destino Z-04.",
       });
       break;
     }
     case ACTION_TYPES.ASSIGN_CREW: {
       const crewId = action.crewId || "ferralla-norte";
       state.crews = state.crews.map((crew) => crew.id === crewId
-        ? { ...crew, status: "assigned", task: "Corrección y apoyo a inspección Z-04", briefingComplete: true }
+        ? { ...crew, status: "assigned", task: "Fabricación y montaje de ferralla Z-04", briefingComplete: true }
         : crew);
       state.workPackage.assignedCrewId = crewId;
       state.workPackage.status = "inspection_pending";
@@ -920,8 +968,8 @@ function handleGameplayAction(state, action) {
       state.flags.crewAssigned = true;
       setClock(state, 9 * 60 + 5);
       completeStandardAction(state, action.type, {
-        title: "Cuadrilla movilizada",
-        text: "Ferralla Norte ha recibido la orden, los medios y la charla de tarea.",
+        title: "Acero recepcionado y cuadrilla movilizada",
+        text: "B500S Ø16 conserva etiqueta y destino; cizalla, dobladora y mandriles están verificados.",
       });
       break;
     }
@@ -930,9 +978,11 @@ function handleGameplayAction(state, action) {
       incident.status = "open";
       incident.detectedAt = nowIso();
       state.flags.defectDetected = true;
+      state.flags.fabricationCompleted = true;
       state.inspection.status = "blocked";
       state.inspection.progress = 80;
       state.inspection.scanCompletedAt = nowIso();
+      state.inspection.fabricationCompletedAt = nowIso();
       state.inspection.checklist.armadura = { label: "Armadura", status: "nonconforming", value: "270 mm · paño NE" };
       state.inspection.checklist.recubrimiento = { label: "Recubrimiento", status: "verified", value: "74 mm" };
       state.inspection.checklist.encofrado = { label: "Encofrado", status: "verified", value: "Conforme" };
@@ -943,7 +993,8 @@ function handleGameplayAction(state, action) {
         { id: "F-Z04-COTA", label: "Cota superior", measured: -1.492, expected: -1.5, unit: "m", status: "conforming", ruleId: "OR27-C101-COTA-Z04" },
       ];
       state.inspection.evidence.push(
-        makeEvidence("scan", "Nube de puntos Z-04", "Separación máxima detectada: 270 mm", incident.ruleId),
+        makeEvidence("fabrication", "Serie Z04-PE-16 fabricada", "Gancho Ø16 B500S · mandril 64 mm · autocontrol conforme", "CE-49-3-4-DOBLADO"),
+        makeEvidence("measurement", "Control manual del paño noreste", "Separación máxima detectada: 270 mm", incident.ruleId),
         makeEvidence("measurement", "Control de recubrimiento", "74 mm · conforme al criterio del proyecto", "OR27-CC-REC-Z04"),
         makeEvidence("measurement", "Control de cota", "−1,492 m · conforme al criterio del proyecto", "OR27-C101-COTA-Z04"),
       );
@@ -952,8 +1003,8 @@ function handleGameplayAction(state, action) {
       state.workPackage.percent = 36;
       setClock(state, 9 * 60 + 38);
       completeStandardAction(state, action.type, {
-        title: "Punto de parada bloqueado",
-        text: "Incidencia INC-Z04-001: separación de 270 mm fuera de la prescripción del proyecto.",
+        title: "Fabricación completada · montaje bloqueado",
+        text: "Las barras están fabricadas, pero el montaje revela 270 mm en un paño prescrito a 200 ±10 mm.",
       });
       break;
     }
@@ -965,6 +1016,7 @@ function handleGameplayAction(state, action) {
       incident.correctedAt = nowIso();
       incident.cost = 680;
       state.flags.correctionApplied = true;
+      state.flags.assemblyCompleted = true;
       state.inspection.checklist.armadura = { label: "Armadura", status: "recheck", value: "Reajustada a 200 mm" };
       state.inspection.evidence.push(
         makeEvidence("photo", "Corrección ejecutada", "Parrilla reajustada y calzada; pendiente de reinspección", incident.ruleId),
@@ -973,8 +1025,8 @@ function handleGameplayAction(state, action) {
       state.workPackage.percent = 48;
       setClock(state, 10 * 60 + 8);
       completeStandardAction(state, action.type, {
-        title: "Corrección documentada",
-        text: "La parrilla se ha reajustado a 200 mm. La incidencia sigue abierta hasta reinspeccionar.",
+        title: "Parrilla montada y corrección documentada",
+        text: "Separadores, parrilla y esperas están estables; el paño queda reajustado a 200 mm y pendiente de control final.",
       });
       break;
     }
@@ -994,7 +1046,7 @@ function handleGameplayAction(state, action) {
         spacingFinding.reinspection = true;
       }
       state.inspection.evidence.push(
-        makeEvidence("measurement", "Reinspección de armadura", "200 mm · incidencia cerrada", incident.ruleId),
+        makeEvidence("measurement", "Control final de armado", "Paso 200 mm · solape según D-101 · recubrimiento 74 mm", "CE-49-5-2-SOLAPES"),
       );
       state.workPackage.status = "weather_review";
       state.workPackage.approval = "technically_conforming";
@@ -1265,11 +1317,11 @@ export function getUIData(state) {
   const qualityScore = state.flags.reinspectionPassed ? 98 : state.flags.defectDetected ? 74 : 92;
   const nextRankXp = rankProgress.next?.minXp ?? state.profile.xp;
   const checklist = [
-    { label: "Replanteo", done: true, warning: false },
-    { label: "Documentación del proyecto", done: state.flags.plansReviewed, warning: false },
-    { label: "Cuadrilla de ferralla", done: state.flags.crewAssigned, warning: false },
+    { label: "Briefing y punto de parada", done: state.flags.briefingAccepted, warning: false },
+    { label: "Detalle y planilla de despiece", done: state.flags.detailCompleted, warning: false },
+    { label: "Acero B500S y cuadrilla", done: state.flags.crewAssigned, warning: false },
     {
-      label: "Armadura y separadores",
+      label: "Corte, doblado y montaje",
       done: state.flags.reinspectionPassed,
       warning: state.flags.defectDetected && !state.flags.reinspectionPassed,
     },

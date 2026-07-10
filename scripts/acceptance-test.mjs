@@ -23,6 +23,18 @@ try {
   await page.waitForTimeout(1_200);
 
   const snapshot = () => page.evaluate(() => window.__COR_TEST__.snapshot());
+  const solveMission = async () => {
+    await page.locator('[data-hud-panel="mission"]').first().click();
+    await page.locator('.cor-training').waitFor({ state: 'visible' });
+    let guard = 0;
+    while (await page.locator('[data-training-choice][data-correct="true"]:not([disabled])').count()) {
+      await page.locator('[data-training-choice][data-correct="true"]:not([disabled])').first().click();
+      await page.waitForTimeout(30);
+      if ((guard += 1) > 8) throw new Error('La misión formativa no converge.');
+    }
+    await page.locator('[data-hud-action="complete-training"]:not([disabled])').click();
+    await page.waitForTimeout(180);
+  };
   const initial = await snapshot();
   await page.screenshot({ path: 'work/acceptance-sunny.png' });
 
@@ -42,34 +54,26 @@ try {
   if (!stopped.rebar || stopped.rebar.lowerBarCount < 100) failures.push('El sistema técnico de armaduras no está inicializado.');
   if (stopped.obstacles < 8 || stopped.interactions < 3) failures.push('Escena sin densidad funcional suficiente.');
 
-  await page.evaluate(() => {
-    for (let step = 0; step < 4; step += 1) window.__COR_TEST__.completeRecommendedAction();
-  });
-  await page.waitForTimeout(250);
+  await solveMission(); // briefing
+  await solveMission(); // detalle y despiece
+  await solveMission(); // recepción y cuadrilla
+  await page.locator('[data-hud-panel="mission"]').first().click();
+  await page.locator('.cor-training-diagram--bend').waitFor({ state: 'visible' });
+  await page.screenshot({ path: 'work/acceptance-ferralla.png' });
+  await page.keyboard.press('Escape');
+  await solveMission(); // corte y doblado
   const defective = await snapshot();
   if (defective.phase !== 'correccion' || !defective.spacingDefect) {
-    failures.push(`La inspección no materializó la incidencia: fase=${defective.phase}, defecto=${defective.spacingDefect}.`);
+    failures.push(`La simulación de ferralla no materializó la incidencia: fase=${defective.phase}, defecto=${defective.spacingDefect}.`);
   }
 
-  await page.locator('.cor-hotbar [data-hud-panel="tablet"]').click();
-  await page.locator('[data-modal-layer]:not([hidden])').waitFor({ state: 'visible' });
-  await page.waitForTimeout(180);
-  const tablet = await snapshot();
-  if (tablet.activePanel !== 'tablet') failures.push('La tablet no abrió el panel de inspección.');
-  if (!tablet.inspectionOverlay) failures.push('La RA no resaltó la barra desplazada.');
-  await page.screenshot({ path: 'work/acceptance-tablet.png' });
-  await page.locator('.cor-modal__close').click();
-  await page.locator('[data-modal-layer]').waitFor({ state: 'hidden' });
-
-  await page.evaluate(() => window.__COR_TEST__.completeRecommendedAction());
-  await page.waitForTimeout(120);
+  await solveMission(); // montaje y corrección
   const corrected = await snapshot();
-  if (corrected.spacingDefect || corrected.phase !== 'reinspeccion') failures.push('La corrección no restituyó la geometría antes de reinspeccionar.');
+  if (corrected.spacingDefect || corrected.phase !== 'reinspeccion') failures.push('El montaje no restituyó la geometría antes del control final.');
 
-  await page.evaluate(() => window.__COR_TEST__.completeRecommendedAction());
-  await page.waitForTimeout(140);
+  await solveMission(); // solapes, anclajes y control
   const climateDecision = await snapshot();
-  if (climateDecision.phase !== 'clima') failures.push('La reinspección no abrió la decisión meteorológica.');
+  if (climateDecision.phase !== 'clima') failures.push('El control final no abrió la decisión meteorológica.');
   await page.evaluate(() => window.__COR_TEST__.setWeather('rain'));
   await page.locator('.cor-nav [data-hud-panel="weather"]').click();
   await page.locator('[data-hud-action="unsafe-weather"]').click();
@@ -80,10 +84,12 @@ try {
   }
   await page.screenshot({ path: 'work/acceptance-supervisor-reprimand.png' });
 
-  await page.evaluate(() => {
-    for (let step = 0; step < 4; step += 1) window.__COR_TEST__.completeRecommendedAction();
-  });
+  await page.locator('.cor-nav [data-hud-panel="weather"]').click();
+  await page.locator('[data-hud-action="safe-weather"]').click();
   await page.waitForTimeout(180);
+  await solveMission(); // recepción y vertido
+  await solveMission(); // curado
+  await solveMission(); // debrief
   const completed = await snapshot();
   if (completed.missionStatus !== 'completed' || completed.phase !== 'debrief') failures.push('El flujo completo no cerró el dossier de calidad.');
 
@@ -101,7 +107,7 @@ try {
   await page.evaluate(() => window.__COR_TEST__.setWeather('sunny'));
 
   if (consoleErrors.length) failures.push(`Errores de consola: ${consoleErrors.join(' | ')}`);
-  const report = { initial, moving, stopped, defective, tablet, corrected, climateDecision, reprimand, completed, hiddenHud, rainy, travel, consoleErrors, failures };
+  const report = { initial, moving, stopped, defective, corrected, climateDecision, reprimand, completed, hiddenHud, rainy, travel, consoleErrors, failures };
   console.log(JSON.stringify(report, null, 2));
   if (failures.length) process.exitCode = 2;
 } finally {
