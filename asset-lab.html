@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>Laboratorio de activos · Cimentaciones: Obra Real</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #111820; color: #fff; font-family: Inter, Arial, sans-serif; }
+      canvas { width: 100%; height: 100%; display: block; }
+      .lab { position: fixed; left: 24px; bottom: 24px; z-index: 2; padding: 14px 18px; border: 1px solid #41596a; border-radius: 10px; background: rgba(8, 18, 27, .88); backdrop-filter: blur(12px); }
+      .lab strong { display: block; color: #f8bd22; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+      .lab span { display: block; margin-top: 5px; color: #bdd1df; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <canvas id="lab-canvas"></canvas>
+    <div class="lab"><strong id="lab-name">Cargando activo…</strong><span id="lab-data">Validación PBR · escala métrica · rig</span></div>
+    <script type="module" src="/src/assetLab.js"></script>
+  </body>
+</html>

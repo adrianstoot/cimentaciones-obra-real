@@ -1,0 +1,25 @@
+{
+  "name": "cimentaciones-obra-real-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test:state": "node scripts/state-machine-test.mjs",
+    "test:ai": "node --test tests/ai/DialogueDirector.test.js tests/ai/SiteSupervisorAI.test.js",
+    "test:phases": "node scripts/phase-acceptance.mjs",
+    "test:acceptance": "node scripts/acceptance-test.mjs",
+    "test": "npm run test:state && npm run test:ai && npm run test:phases"
+  },
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@gltf-transform/cli": "^4.4.1",
+    "fbx2gltf": "^0.9.7-p1",
+    "playwright-core": "^1.61.1",
+    "vite": "^7.1.7"
+  }
+}

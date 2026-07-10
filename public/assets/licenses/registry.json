@@ -1,0 +1,618 @@
+{
+  "schemaVersion": "1.0.0",
+  "lastReviewed": "2026-07-10",
+  "project": "Cimentaciones: Obra Real",
+  "purpose": "Registro de procedencia, integridad y derechos de los activos visuales presentes en public/assets.",
+  "policy": {
+    "publicationGate": "Un activo con license.status distinto de verified no debe incluirse en una distribucion publica hasta completar la revision documental.",
+    "hashAlgorithm": "SHA-256",
+    "paths": "Las rutas runtime son absolutas respecto de la raiz publica de la aplicacion web.",
+    "legalNotice": "Este inventario es trazabilidad tecnica; no sustituye una revision juridica de la licencia ni de los derechos de terceros."
+  },
+  "licenseDefinitions": {
+    "CC0-1.0": {
+      "name": "Creative Commons Zero v1.0 Universal",
+      "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "redistribution": "permitted",
+      "attributionRequired": false
+    },
+    "LicenseRef-UNVERIFIED": {
+      "name": "Licencia o cadena de derechos no verificada",
+      "url": null,
+      "redistribution": "blocked_pending_review",
+      "attributionRequired": null
+    },
+    "LicenseRef-THREEJS-ASSET-REVIEW": {
+      "name": "Activo alojado en el repositorio three.js; procedencia especifica pendiente de revision",
+      "url": "https://github.com/mrdoob/three.js/blob/dev/LICENSE",
+      "redistribution": "blocked_pending_review",
+      "attributionRequired": null
+    },
+    "Project-Original-Generated": {
+      "name": "Arte original generado expresamente para Cimentaciones: Obra Real",
+      "url": null,
+      "redistribution": "project_use_permitted",
+      "attributionRequired": false
+    }
+  },
+  "assets": [
+    {
+      "id": "character.worker_ch17",
+      "category": "character",
+      "title": "Obrero de construccion Ch17",
+      "runtime": {
+        "url": "/assets/characters/worker_ch17.glb",
+        "format": "glb",
+        "bytes": 53494772,
+        "sha256": "bdc89aa469c14adced67302a0a81bdc08fc837a1216a41695b7566b2cd065ef2"
+      },
+      "source": {
+        "provider": "Archivo local aportado por el usuario",
+        "originalPath": "C:/Users/Adrian/Downloads/PERSONAJES/Ch17_nonPBR.fbx",
+        "conversion": "FBX convertido a glTF binario con FBX2glTF; texturas integradas",
+        "notes": "Rig con nomenclatura Mixamo, pero no existe comprobante de licencia asociado en el proyecto."
+      },
+      "license": {
+        "id": "LicenseRef-UNVERIFIED",
+        "status": "unverified",
+        "redistribution": "blocked_pending_review",
+        "reviewRequired": true
+      }
+    },
+    {
+      "id": "animation.local_idle",
+      "category": "animation",
+      "title": "Idle local",
+      "runtime": {
+        "url": "/assets/characters/animations/idle.glb",
+        "format": "glb-animation",
+        "bytes": 184876,
+        "sha256": "84cb85a479944b5c896b3c7d823ba035c68123480763552bbf3d308eb1cfdc94"
+      },
+      "source": {
+        "provider": "Archivo local aportado por el usuario",
+        "originalPath": "C:/Users/Adrian/Downloads/PERSONAJES/Idle.fbx",
+        "conversion": "FBX convertido a GLB y reducido a esqueleto y clip",
+        "notes": "Animacion con rig tipo Mixamo; comprobante y terminos aplicables no adjuntos."
+      },
+      "license": {
+        "id": "LicenseRef-UNVERIFIED",
+        "status": "unverified",
+        "redistribution": "blocked_pending_review",
+        "reviewRequired": true
+      }
+    },
+    {
+      "id": "animation.tablet",
+      "category": "animation",
+      "title": "Trabajo con tablet",
+      "runtime": {
+        "url": "/assets/characters/animations/Tablet.glb",
+        "format": "glb-animation",
+        "bytes": 210132,
+        "sha256": "12facce32a534b8ed759ead4ed5fb602a79cfaadaa772b446cdb92e403d2aacb"
+      },
+      "source": {
+        "provider": "Archivo local aportado por el usuario",
+        "originalPath": "C:/Users/Adrian/Downloads/PERSONAJES/Working On Device.fbx",
+        "conversion": "FBX convertido a GLB y reducido a esqueleto y clip",
+        "notes": "Animacion con rig tipo Mixamo; comprobante y terminos aplicables no adjuntos."
+      },
+      "license": {
+        "id": "LicenseRef-UNVERIFIED",
+        "status": "unverified",
+        "redistribution": "blocked_pending_review",
+        "reviewRequired": true
+      }
+    },
+    {
+      "id": "animation.idle_ch17",
+      "category": "animation",
+      "title": "Idle nativo para Ch17",
+      "runtime": {
+        "url": "/assets/characters/animations/idle_ch17.glb",
+        "format": "glb-animation",
+        "bytes": 83616,
+        "sha256": "7e309eba0ee91f8fa99c41b6289b39b5cfeb58b387e29339e369128b9364c5f5"
+      },
+      "source": {
+        "provider": "Archivo local aportado por el usuario",
+        "originalPath": "C:/Users/Adrian/Downloads/PERSONAJES/Idle2.fbx",
+        "conversion": "FBX convertido a GLB y reducido a esqueleto y clip compatible con Ch17",
+        "notes": "Animacion con rig tipo Mixamo; comprobante y terminos aplicables no adjuntos."
+      },
+      "license": {
+        "id": "LicenseRef-UNVERIFIED",
+        "status": "unverified",
+        "redistribution": "blocked_pending_review",
+        "reviewRequired": true
+      }
+    },
+    {
+      "id": "animation.putdown_ch17",
+      "category": "animation",
+      "title": "Depositar objeto para Ch17",
+      "runtime": {
+        "url": "/assets/characters/animations/putdown_ch17.glb",
+        "format": "glb-animation",
+        "bytes": 209296,
+        "sha256": "21f293afa787ad1933f181d56b482194ba6b655562ab483668ca86f421a65a55"
+      },
+      "source": {
+        "provider": "Archivo local aportado por el usuario",
+        "originalPath": "C:/Users/Adrian/Downloads/PERSONAJES/Putting Down.fbx",
+        "conversion": "FBX convertido a GLB y reducido a esqueleto y clip compatible con Ch17",
+        "notes": "Animacion con rig tipo Mixamo; comprobante y terminos aplicables no adjuntos."
+      },
+      "license": {
+        "id": "LicenseRef-UNVERIFIED",
+        "status": "unverified",
+        "redistribution": "blocked_pending_review",
+        "reviewRequired": true
+      }
+    },
+    {
+      "id": "animation.locomotion_idle",
+      "category": "animation",
+      "title": "Locomocion: reposo",
+      "runtime": {
+        "url": "/assets/characters/animations/locomotion_idle.glb",
+        "format": "glb-animation",
+        "bytes": 268536,
+        "sha256": "b124a4e4431c17a30fe4c4e22c6f1326ebebf0abf84afae65df6ad05985f13bd"
+      },
+      "source": {
+        "provider": "Repositorio oficial three.js",
+        "url": "https://github.com/mrdoob/three.js/blob/dev/examples/models/gltf/Soldier.glb",
+        "conversion": "Clip Idle extraido; mallas y texturas descartadas",
+        "notes": "El repositorio usa MIT, pero la autoria/licencia especifica del modelo Soldier no se ha auditado por separado."
+      },
+      "license": {
+        "id": "LicenseRef-THREEJS-ASSET-REVIEW",
+        "status": "review_required",
+        "redistribution": "blocked_pending_review",
+        "reviewRequired": true
+      }
+    },
+    {
+      "id": "animation.walk",
+      "category": "animation",
+      "title": "Locomocion: caminar",
+      "runtime": {
+        "url": "/assets/characters/animations/walk.glb",
+        "format": "glb-animation",
+        "bytes": 323656,
+        "sha256": "4cadb5df1514654eda6cdf811c9b80ec594b5112c532c17b0e890e08e4351afe"
+      },
+      "source": {
+        "provider": "Repositorio oficial three.js",
+        "url": "https://github.com/mrdoob/three.js/blob/dev/examples/models/gltf/Soldier.glb",
+        "conversion": "Clip Walk extraido; mallas y texturas descartadas",
+        "notes": "El repositorio usa MIT, pero la autoria/licencia especifica del modelo Soldier no se ha auditado por separado."
+      },
+      "license": {
+        "id": "LicenseRef-THREEJS-ASSET-REVIEW",
+        "status": "review_required",
+        "redistribution": "blocked_pending_review",
+        "reviewRequired": true
+      }
+    },
+    {
+      "id": "animation.run",
+      "category": "animation",
+      "title": "Locomocion: correr",
+      "runtime": {
+        "url": "/assets/characters/animations/run.glb",
+        "format": "glb-animation",
+        "bytes": 335268,
+        "sha256": "4aded4b441b1390de887295413c9b81e2dfa9538102ba145cb7af49e023f8473"
+      },
+      "source": {
+        "provider": "Repositorio oficial three.js",
+        "url": "https://github.com/mrdoob/three.js/blob/dev/examples/models/gltf/Soldier.glb",
+        "conversion": "Clip Run extraido; mallas y texturas descartadas",
+        "notes": "El repositorio usa MIT, pero la autoria/licencia especifica del modelo Soldier no se ha auditado por separado."
+      },
+      "license": {
+        "id": "LicenseRef-THREEJS-ASSET-REVIEW",
+        "status": "review_required",
+        "redistribution": "blocked_pending_review",
+        "reviewRequired": true
+      }
+    },
+    {
+      "id": "retarget.soldier_source",
+      "category": "retarget-source",
+      "title": "Soldier: rig fuente invisible para retarget",
+      "runtime": {
+        "url": "/assets/characters/retarget/soldier_source.glb",
+        "format": "glb",
+        "usage": "runtime-retarget-source-invisible",
+        "bytes": 2160468,
+        "sha256": "dfb230fc1f942f259dd00281a1186953ad602fc5d69067ce63e24b2aa439736b"
+      },
+      "source": {
+        "provider": "Repositorio oficial three.js",
+        "url": "https://github.com/mrdoob/three.js/blob/dev/examples/models/gltf/Soldier.glb",
+        "conversion": "Copia de trabajo usada exclusivamente como esqueleto fuente invisible de retarget",
+        "notes": "El repositorio usa MIT, pero la autoria/licencia especifica del ejemplo Soldier/Mixamo no se ha auditado por separado."
+      },
+      "license": {
+        "id": "LicenseRef-THREEJS-ASSET-REVIEW",
+        "status": "review_required",
+        "redistribution": "blocked_pending_review",
+        "reviewRequired": true
+      }
+    },
+    {
+      "id": "hdri.construction_yard",
+      "category": "hdri",
+      "title": "Construction Yard 4K",
+      "runtime": {
+        "url": "/assets/hdri/construction_yard_4k.hdr",
+        "format": "radiance-hdr",
+        "resolution": "4k",
+        "bytes": 25931071,
+        "sha256": "27e08198716e17bbad91bfa3d8d6f4dc60a1585223aacf703528f4924d44b6ee"
+      },
+      "source": {
+        "provider": "Poly Haven",
+        "url": "https://polyhaven.com/a/construction_yard",
+        "downloadUrl": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/construction_yard_4k.hdr"
+      },
+      "license": {
+        "id": "CC0-1.0",
+        "status": "verified",
+        "redistribution": "permitted",
+        "reviewRequired": false
+      }
+    },
+    {
+      "id": "hdri.german_town_street",
+      "category": "hdri",
+      "title": "German Town Street 4K",
+      "runtime": {
+        "url": "/assets/hdri/german_town_street_4k.hdr",
+        "format": "radiance-hdr",
+        "resolution": "4k",
+        "bytes": 25613588,
+        "sha256": "544a9c4d1192d06bad891fc00a843e10f4a9e62c2759c239ec72d0473c33cefc"
+      },
+      "source": {
+        "provider": "Poly Haven",
+        "url": "https://polyhaven.com/a/german_town_street",
+        "downloadUrl": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/german_town_street_4k.hdr",
+        "provenance": "Descarga directa del CDN oficial de Poly Haven el 2026-07-10; archivo conservado sin conversion ni recompresion."
+      },
+      "license": {
+        "id": "CC0-1.0",
+        "status": "verified",
+        "redistribution": "permitted",
+        "reviewRequired": false
+      }
+    },
+    {
+      "id": "machinery.rough_terrain_crane",
+      "category": "machinery",
+      "title": "Grua movil todoterreno",
+      "runtime": {
+        "url": "/assets/machinery/rough_terrain_crane.glb",
+        "format": "glb",
+        "bytes": 9906772,
+        "sha256": "2e0254ada877582c70cd369838e33da3797b1271317ac284bed385ac0a294d75"
+      },
+      "source": {
+        "provider": "Archivo local aportado por el usuario",
+        "originalPath": "C:/Users/Adrian/Downloads/source/Rough-Terrain Crane.glb",
+        "conversion": "Materiales specular/glossiness convertidos a metallic/roughness",
+        "notes": "LICENCIA NO VERIFICADA: no hay autor, URL de compra/descarga ni comprobante en el proyecto."
+      },
+      "license": {
+        "id": "LicenseRef-UNVERIFIED",
+        "status": "unverified",
+        "redistribution": "blocked_pending_review",
+        "reviewRequired": true,
+        "blockingReason": "Modelo de grua aportado por el usuario sin licencia verificable."
+      }
+    },
+    {
+      "id": "machinery.lr1300_crane",
+      "category": "machinery",
+      "title": "Grua de celosia LR 1300",
+      "runtime": {
+        "url": "/assets/machinery/lr1300_crane.glb",
+        "format": "glb",
+        "bytes": 1519144,
+        "sha256": "028014b18526a8971b0d5fb291e360ae6bf25274f916674074d1dc6c52732e27"
+      },
+      "source": {
+        "provider": "Archivo local aportado por el usuario",
+        "originalPath": "C:/Users/Adrian/Downloads/source/LR 1300.glb",
+        "conversion": "Materiales specular/glossiness convertidos a metallic/roughness",
+        "notes": "LICENCIA NO VERIFICADA: no hay autor, URL de compra/descarga ni comprobante en el proyecto."
+      },
+      "license": {
+        "id": "LicenseRef-UNVERIFIED",
+        "status": "unverified",
+        "redistribution": "blocked_pending_review",
+        "reviewRequired": true,
+        "blockingReason": "Modelo de grua aportado por el usuario sin licencia verificable."
+      }
+    },
+    {
+      "id": "prop.barrel_03",
+      "category": "prop",
+      "title": "Barril metalico",
+      "runtime": { "url": "/assets/props/barrel_03/barrel_03.glb", "format": "glb", "resolution": "2k", "bytes": 2080348, "sha256": "db9fe6ce833bc0edbd76183abd909c40e648c2bc2632e582fae049b69db70b06" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/barrel_03", "sourceDirectory": "/assets/props/barrel_03/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.cardboard_box_01",
+      "category": "prop",
+      "title": "Caja de carton",
+      "runtime": { "url": "/assets/props/cardboard_box_01/cardboard_box_01.glb", "format": "glb", "resolution": "2k", "bytes": 6686712, "sha256": "fae0a27876310df94b53af53ce6af23f0467ee3abb88321ae196f12048077c1e" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/cardboard_box_01", "sourceDirectory": "/assets/props/cardboard_box_01/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.cement_bag",
+      "category": "prop",
+      "title": "Saco de cemento",
+      "runtime": { "url": "/assets/props/cement_bag/cement_bag.glb", "format": "glb", "resolution": "2k", "bytes": 5595620, "sha256": "080f7bb6a7cf0c7d7320f29588fc5dc69ad3951973a282c2334129914300bfc5" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/cement_bag", "sourceDirectory": "/assets/props/cement_bag/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.concrete_road_barrier",
+      "category": "prop",
+      "title": "Barrera de hormigon",
+      "runtime": { "url": "/assets/props/concrete_road_barrier/concrete_road_barrier.glb", "format": "glb", "resolution": "2k", "bytes": 10969356, "sha256": "1247726f47d1f2131347ff878c8cdbc7fdf4321adad05a3fd6e614596634156b" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/concrete_road_barrier", "sourceDirectory": "/assets/props/concrete_road_barrier/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.hand_truck",
+      "category": "prop",
+      "title": "Carretilla de transporte",
+      "runtime": { "url": "/assets/props/hand_truck/hand_truck.glb", "format": "glb", "resolution": "2k", "bytes": 10897736, "sha256": "8eee69b9f81ba992915038f3b76821aa01da667af088df5e57010a35e86a7c6a" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/hand_truck", "sourceDirectory": "/assets/props/hand_truck/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.ladder_sectioned_01",
+      "category": "prop",
+      "title": "Escalera seccionada",
+      "runtime": { "url": "/assets/props/ladder_sectioned_01/ladder_sectioned_01.glb", "format": "glb", "resolution": "2k", "bytes": 6676004, "sha256": "437ff700969862e3bd79f9aa470123237b0c29185a08e9785d75f0b0e8259df2" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/ladder_sectioned_01", "sourceDirectory": "/assets/props/ladder_sectioned_01/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.metal_jerrycan",
+      "category": "prop",
+      "title": "Bidon metalico",
+      "runtime": { "url": "/assets/props/metal_jerrycan/metal_jerrycan.glb", "format": "glb", "resolution": "2k", "bytes": 10586168, "sha256": "ab6a93849ff911d7a18364a06b28472f87ac66c33281837918832ca8b7a7fbd6" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/metal_jerrycan", "sourceDirectory": "/assets/props/metal_jerrycan/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.metal_toolbox",
+      "category": "prop",
+      "title": "Caja de herramientas metalica",
+      "runtime": { "url": "/assets/props/metal_toolbox/metal_toolbox.glb", "format": "glb", "resolution": "2k", "bytes": 10116672, "sha256": "b3489df892f56866d738e2886b3668ee4a12ea3723954e58de29052ae8d26089" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/metal_toolbox", "sourceDirectory": "/assets/props/metal_toolbox/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.modular_chainlink_fence",
+      "category": "prop",
+      "title": "Vallado metalico modular",
+      "runtime": { "url": "/assets/props/modular_chainlink_fence/modular_chainlink_fence.glb", "format": "glb", "resolution": "2k", "bytes": 16200928, "sha256": "ae12a92fabc75acdf76a4749faeea218a44f4ec46443cff3f0273cad2807536a" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/modular_chainlink_fence", "sourceDirectory": "/assets/props/modular_chainlink_fence/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.modular_wooden_pier",
+      "category": "prop",
+      "title": "Estructura modular de madera",
+      "runtime": { "url": "/assets/props/modular_wooden_pier/modular_wooden_pier.glb", "format": "glb", "resolution": "2k", "bytes": 23049192, "sha256": "4b67f0574e94cf294c2062b0ff7e19da30d48aad83000b999e7058fb1bec8929" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/modular_wooden_pier", "sourceDirectory": "/assets/props/modular_wooden_pier/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.portable_generator",
+      "category": "prop",
+      "title": "Generador portatil",
+      "runtime": { "url": "/assets/props/portable_generator/portable_generator.glb", "format": "glb", "resolution": "2k", "bytes": 12451684, "sha256": "cab2c3f00b68b44d08d19e37011ac9ab2a03c372a54643c1bd5b1af53331cfca" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/portable_generator", "sourceDirectory": "/assets/props/portable_generator/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.wooden_ladder",
+      "category": "prop",
+      "title": "Escalera de madera",
+      "runtime": { "url": "/assets/props/wooden_ladder/wooden_ladder.glb", "format": "glb", "resolution": "2k", "bytes": 8917168, "sha256": "93b3725a1075b2fc8da814fad7e94b5084ed1e17a32616c3082c235bbaef5e7f" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/wooden_ladder", "sourceDirectory": "/assets/props/wooden_ladder/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.concrete_road_barrier_02",
+      "category": "prop",
+      "title": "Barrera de hormigon 02",
+      "runtime": { "url": "/assets/props/concrete_road_barrier_02/concrete_road_barrier_02.glb", "format": "glb", "resolution": "2k", "bytes": 9831444, "sha256": "79b92ab7e357a2b51b132a9f37704e6288974a58e95cf5a6582824348df94e18" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/concrete_road_barrier_02", "sourceDirectory": "/assets/props/concrete_road_barrier_02/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.modular_electric_cables",
+      "category": "prop",
+      "title": "Cables electricos modulares",
+      "runtime": { "url": "/assets/props/modular_electric_cables/modular_electric_cables.glb", "format": "glb", "resolution": "2k", "bytes": 17621604, "sha256": "d94ef50b0c6858de5fbe7bec05b3df69ab1fb67ccd5b7c85fb1a1ac0e7d7fc03" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/modular_electric_cables", "sourceDirectory": "/assets/props/modular_electric_cables/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.modular_industrial_pipes_01",
+      "category": "prop",
+      "title": "Tuberias industriales modulares 01",
+      "runtime": { "url": "/assets/props/modular_industrial_pipes_01/modular_industrial_pipes_01.glb", "format": "glb", "resolution": "2k", "bytes": 16610512, "sha256": "241be4ebfee4f60c166d2d2fcc71864d6e8d9189e311d1f0127e11d72f6c51fd" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/modular_industrial_pipes_01", "sourceDirectory": "/assets/props/modular_industrial_pipes_01/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.metal_tool_chest",
+      "category": "prop",
+      "title": "Arcón metalico de herramientas",
+      "runtime": { "url": "/assets/props/metal_tool_chest/metal_tool_chest.glb", "format": "glb", "resolution": "2k", "bytes": 7742340, "sha256": "7711830c8fa8062e7ba5e6c684f290efb482e7446635dd14b7b8bb4f875cde86" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/metal_tool_chest", "sourceDirectory": "/assets/props/metal_tool_chest/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.tool_cart",
+      "category": "prop",
+      "title": "Carro de herramientas",
+      "runtime": { "url": "/assets/props/tool_cart/tool_cart.glb", "format": "glb", "resolution": "2k", "bytes": 9836792, "sha256": "521cb2e8df8ead08a8a419c466a9a5ee13320ae0fdf39f7709ca23fe4b62525b" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/tool_cart", "sourceDirectory": "/assets/props/tool_cart/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.steel_frame_shelves_01",
+      "category": "prop",
+      "title": "Estanterias de acero 01",
+      "runtime": { "url": "/assets/props/steel_frame_shelves_01/steel_frame_shelves_01.glb", "format": "glb", "resolution": "2k", "bytes": 5567948, "sha256": "bbc7db5777547fcaa82314324a5be0ec1961d6d7f15aa062fe2fdbd1d1e7ee6c" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/steel_frame_shelves_01", "sourceDirectory": "/assets/props/steel_frame_shelves_01/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "prop.wooden_crate_01",
+      "category": "prop",
+      "title": "Caja de madera 01",
+      "runtime": { "url": "/assets/props/wooden_crate_01/wooden_crate_01.glb", "format": "glb", "resolution": "2k", "bytes": 8283544, "sha256": "65ac700acea5a84217bba6a056462d6247764d49f6ed6db54e82742af003d414" },
+      "source": { "provider": "Poly Haven", "url": "https://polyhaven.com/a/wooden_crate_01", "sourceDirectory": "/assets/props/wooden_crate_01/_source/" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "texture.concrete044c",
+      "category": "texture-set",
+      "title": "Concrete044C PBR 4K",
+      "runtime": {
+        "resolution": "4k",
+        "maps": {
+          "preview": { "url": "/assets/textures/Concrete044C/Concrete044C.png", "bytes": 364186, "sha256": "98f8582518bd2b0101ca2fd90d73bee6a62b4cf33ce9ef1ca8b66383fcf439a0" },
+          "ambientOcclusion": { "url": "/assets/textures/Concrete044C/Concrete044C_4K-JPG_AmbientOcclusion.jpg", "bytes": 10193725, "sha256": "94ed661371f725a2350829e9ad78bfadcefd1beae755cc0ebb968f68a8c845e4" },
+          "color": { "url": "/assets/textures/Concrete044C/Concrete044C_4K-JPG_Color.jpg", "bytes": 15701682, "sha256": "9c9de8261c03ab35e79119756ba938822fb8381d10d3439f8119e08f8396b34b" },
+          "displacement": { "url": "/assets/textures/Concrete044C/Concrete044C_4K-JPG_Displacement.jpg", "bytes": 5736494, "sha256": "c2eca74c2d9b77e6711f1ad61dfe295d92e4abb3cc16088a29589e0373a17335" },
+          "metalness": { "url": "/assets/textures/Concrete044C/Concrete044C_4K-JPG_Metalness.jpg", "bytes": 66667, "sha256": "2550525805020660416989e6bf367042cf7677e3ffbac999aafa13c80e9676a6" },
+          "normalDx": { "url": "/assets/textures/Concrete044C/Concrete044C_4K-JPG_NormalDX.jpg", "bytes": 34488862, "sha256": "243753ef14fb0f4092b46969be705a59a906dabb7d2366ac07903d73c025a109" },
+          "normalGl": { "url": "/assets/textures/Concrete044C/Concrete044C_4K-JPG_NormalGL.jpg", "bytes": 34492018, "sha256": "c304785832160fed628c94daf76040ae628edefb997124255a99a847facff908" },
+          "roughness": { "url": "/assets/textures/Concrete044C/Concrete044C_4K-JPG_Roughness.jpg", "bytes": 12500712, "sha256": "d21cd302ac8a4688f9545d78883567766d5ec4027af6dd231109449debb9468e" }
+        },
+        "authoringFiles": [
+          "/assets/textures/Concrete044C/Concrete044C_4K-JPG.blend",
+          "/assets/textures/Concrete044C/Concrete044C_4K-JPG.mtlx",
+          "/assets/textures/Concrete044C/Concrete044C_4K-JPG.tres",
+          "/assets/textures/Concrete044C/Concrete044C_4K-JPG.usdc"
+        ]
+      },
+      "source": { "provider": "ambientCG", "url": "https://ambientcg.com/view?id=Concrete044C", "downloadBundleSha256": "7f426fda11ceb30b89814cbb5e9a9448cc52b6423821b1d9bcc6ca3e60d54312" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "texture.ground094a",
+      "category": "texture-set",
+      "title": "Ground094A PBR 4K",
+      "runtime": {
+        "resolution": "4k",
+        "maps": {
+          "ambientOcclusion": { "url": "/assets/textures/Ground094A/Ground094A_4K-JPG_AmbientOcclusion.jpg", "bytes": 3758770, "sha256": "a005f64e91b049f281655bd38d8c4851f4150a5131a7771dbb3941807c22571b" },
+          "color": { "url": "/assets/textures/Ground094A/Ground094A_4K-JPG_Color.jpg", "bytes": 13186571, "sha256": "d5797e6e2ebaac15a32b94954b796ab66dfa7110cc746972064ccb9894d1f0e1" },
+          "displacement": { "url": "/assets/textures/Ground094A/Ground094A_4K-JPG_Displacement.jpg", "bytes": 3323220, "sha256": "d2185e2ab265714937d79a2203421bc5ea9b8e361084a822d0f68304f08d959c" },
+          "normalGl": { "url": "/assets/textures/Ground094A/Ground094A_4K-JPG_NormalGL.jpg", "bytes": 24106448, "sha256": "e973e13d6fa4c35ced2334f595c50df89c2b8703ca9ea096220ca58f3869631b" },
+          "roughness": { "url": "/assets/textures/Ground094A/Ground094A_4K-JPG_Roughness.jpg", "bytes": 13088125, "sha256": "0e1424f0655cd68dd7abe3ad6679cb7c47c52631be560825ae41be6b9c4f6b0c" }
+        }
+      },
+      "source": {
+        "provider": "ambientCG",
+        "url": "https://ambientcg.com/view?id=Ground094A",
+        "downloadUrl": "https://ambientcg.com/get?file=Ground094A_4K-JPG.zip",
+        "downloadBundleBytes": 83052200,
+        "downloadBundleSha256": "e9d7f8b795f71251760d474a26fd7e6c4cd6bc9f3d948c0d16681fd489b804b0",
+        "provenance": "ZIP 4K-JPG descargado mediante el endpoint oficial de ambientCG el 2026-07-10; se extrajeron sin conversion Color, NormalGL, Roughness, AmbientOcclusion y Displacement.",
+        "selectionNote": "Sustitucion explicita de Ground102: su endpoint oficial devolvia 404 y la API publicaba downloads vacio durante la integracion; no se usaron previews ni reescalados."
+      },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "texture.gravel023",
+      "category": "texture-set",
+      "title": "Gravel023 PBR 4K",
+      "runtime": {
+        "resolution": "4k",
+        "maps": {
+          "preview": { "url": "/assets/textures/Gravel023/Gravel023.png", "bytes": 457025, "sha256": "79e10fd2fb59d1927563e7245f3f5076d6299a2811ac2071d792b58dd6be7989" },
+          "ambientOcclusion": { "url": "/assets/textures/Gravel023/Gravel023_4K-JPG_AmbientOcclusion.jpg", "bytes": 10714616, "sha256": "6d4e6215bfa28eb6d2172b07537ea639312de8293fa62ea069cd672bc5db4004" },
+          "color": { "url": "/assets/textures/Gravel023/Gravel023_4K-JPG_Color.jpg", "bytes": 14829261, "sha256": "bf5394642b5199cda6a63dd08c7408fbb0a090fbe08f62db0c27346465581f68" },
+          "displacement": { "url": "/assets/textures/Gravel023/Gravel023_4K-JPG_Displacement.jpg", "bytes": 6034014, "sha256": "6324df8976ca436ba2d4eebe85077a84fd39d0083a324c78a963d75ef143defb" },
+          "normalDx": { "url": "/assets/textures/Gravel023/Gravel023_4K-JPG_NormalDX.jpg", "bytes": 35114013, "sha256": "a3cebeea717cda2f807859e6f8b1f78b2fa695af99168c668490c9ad5cf9f4af" },
+          "normalGl": { "url": "/assets/textures/Gravel023/Gravel023_4K-JPG_NormalGL.jpg", "bytes": 35042224, "sha256": "fc73ce36a3e4cc758bbd657ae1154aa2d4333d45cca147c601ef02cb1143821c" },
+          "roughness": { "url": "/assets/textures/Gravel023/Gravel023_4K-JPG_Roughness.jpg", "bytes": 6367245, "sha256": "c4900e32385d0c096acc9bd255f1f8bff3b5cc65402a746eafc5a80035c832ff" }
+        },
+        "authoringFiles": [
+          "/assets/textures/Gravel023/Gravel023_4K-JPG.blend",
+          "/assets/textures/Gravel023/Gravel023_4K-JPG.mtlx",
+          "/assets/textures/Gravel023/Gravel023_4K-JPG.tres",
+          "/assets/textures/Gravel023/Gravel023_4K-JPG.usdc"
+        ]
+      },
+      "source": { "provider": "ambientCG", "url": "https://ambientcg.com/view?id=Gravel023", "downloadBundleSha256": "c89a65685ca9992d5c556c43afa9268012bde441c8b644fda437047844155baf" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "texture.metal055c",
+      "category": "texture-set",
+      "title": "Metal055C PBR 4K",
+      "runtime": {
+        "resolution": "4k",
+        "maps": {
+          "preview": { "url": "/assets/textures/Metal055C/Metal055C.png", "bytes": 391715, "sha256": "33d8823722fb14176dc607b934741a44c1ece1bc16f3be5b9091fbc1f2c86117" },
+          "color": { "url": "/assets/textures/Metal055C/Metal055C_4K-JPG_Color.jpg", "bytes": 19431449, "sha256": "26617605319287284264f9fe34be3bc1425bd0fa65b9a6ae729b0273253137b9" },
+          "displacement": { "url": "/assets/textures/Metal055C/Metal055C_4K-JPG_Displacement.jpg", "bytes": 4233576, "sha256": "c97117936fc6aeb23b75a92047907338eb85464f2c74be92200293e3abbbe2c0" },
+          "metalness": { "url": "/assets/textures/Metal055C/Metal055C_4K-JPG_Metalness.jpg", "bytes": 3016383, "sha256": "462208ad0f60d07a7fd5589e705f4e84233742a136aeb88874609d5660a619f0" },
+          "normalDx": { "url": "/assets/textures/Metal055C/Metal055C_4K-JPG_NormalDX.jpg", "bytes": 17214499, "sha256": "575587178bb8e4825d9896657d454483b986a86b09157fcd7dcc26fc3988e160" },
+          "normalGl": { "url": "/assets/textures/Metal055C/Metal055C_4K-JPG_NormalGL.jpg", "bytes": 17144270, "sha256": "8a5779c67a71b4ccf86289a1bf9f0c18e4e0522b1ce33b0cdf264bbb80d26f47" },
+          "roughness": { "url": "/assets/textures/Metal055C/Metal055C_4K-JPG_Roughness.jpg", "bytes": 8827107, "sha256": "5da9077f0b5e606ecee99b6f707914187891bc13b2e6dadb3db3821206f66dea" }
+        },
+        "authoringFiles": [
+          "/assets/textures/Metal055C/Metal055C_4K-JPG.blend",
+          "/assets/textures/Metal055C/Metal055C_4K-JPG.mtlx",
+          "/assets/textures/Metal055C/Metal055C_4K-JPG.tres",
+          "/assets/textures/Metal055C/Metal055C_4K-JPG.usdc"
+        ]
+      },
+      "source": { "provider": "ambientCG", "url": "https://ambientcg.com/view?id=Metal055C", "downloadBundleSha256": "e716a118e3d3fbe920f3de76ae667dd76192175c11f48c8b9c38b8202aa183ad" },
+      "license": { "id": "CC0-1.0", "status": "verified", "redistribution": "permitted", "reviewRequired": false }
+    },
+    {
+      "id": "ui.mission-journey-art",
+      "category": "ui-raster-art",
+      "title": "Serie cinematografica de seis tarjetas de mision",
+      "runtime": {
+        "source": { "url": "/assets/ui/missions/mission-journey-source.png", "bytes": 2505099, "sha256": "1e6f12a0cb9e17ad2c1016f87e557b2b35c658bbbb82f6d79382440e7c10e582" },
+        "derivatives": [
+          { "url": "/assets/ui/missions/briefing.jpg", "bytes": 114073, "sha256": "e64790023483bd7004bce3bbc1aa2fa5278dd86c09a59510ccde4fd22a7d2a14" },
+          { "url": "/assets/ui/missions/planos.jpg", "bytes": 103783, "sha256": "d0b702675a96d4964c158b4fd6edfe0dcae1894b75942a82358a97fe63612f59" },
+          { "url": "/assets/ui/missions/inspeccion.jpg", "bytes": 124073, "sha256": "c3a6fe81a158a9dcd4ec6388361e2b79844cb1fcd037b6b4c307f64d502040f5" },
+          { "url": "/assets/ui/missions/clima.jpg", "bytes": 113830, "sha256": "0c4c0913aec102471d7a98ac400519a2f7ea0b6891b8f26cfa04e2e06f2727fa" },
+          { "url": "/assets/ui/missions/vertido.jpg", "bytes": 146905, "sha256": "7db21e3a13a83712ce143b290c4342a89869c0f88e7c68f28f8b7a71a523075b" },
+          { "url": "/assets/ui/missions/cierre.jpg", "bytes": 115935, "sha256": "84f5b4f7574956db300b2f45d5dafe6aaf670d0c817174b228da53eeb0a2167d" }
+        ]
+      },
+      "source": {
+        "provider": "OpenAI image generation tool",
+        "method": "Hoja 3x2 generada para el proyecto y recortes 16:9 sin texto horneado",
+        "notes": "Escenas ficticias; no se usaron rostros reales identificables ni marcas comerciales."
+      },
+      "license": { "id": "Project-Original-Generated", "status": "verified", "redistribution": "project_use_permitted", "reviewRequired": false }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+work/
+.asset-cache/
+.playwright-cli/
+public/assets/props/**/_source/
+public/assets/hdri/construction_yard_4k.hdr
+public/assets/machinery/rough_terrain_crane.glb
+public/assets/props/modular_wooden_pier/
+public/assets/textures/Gravel023/
